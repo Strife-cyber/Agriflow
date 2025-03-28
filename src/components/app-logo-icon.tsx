@@ -1,8 +1,8 @@
 import appLogo from '@/assets/applogo.svg';
 
-export default function AppLogoIcon() {
+export default function AppLogoIcon({ width, height }: {width?: string, height?: string}) {
     return (
-        <div className="relative inline-block w-16 h-16 group">
+        <div className={`relative inline-block w-${width || '16'} h-${height || 16} group`}>
             <img 
                 src={appLogo} 
                 className="w-full h-full object-contain"

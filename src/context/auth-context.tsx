@@ -15,7 +15,7 @@ interface AuthContextType {
     logout: () => void;
 }
 
-const ENCRYPTION_KEY = process.env.APP_ENCRYPTION_KEY || '';
+const ENCRYPTION_KEY = import.meta.env.VITE_APP_ENCRYPTION_KEY || '';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
