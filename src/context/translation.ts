@@ -1,22 +1,14 @@
 import { useLanguage } from "./language-context";
+import translationJson from "@/assets/translations.json";
 
-interface Translation {}
-
-interface Translations {
-    en: Translation;
-    fr: Translation;
-}
-
-export const translations: Translations = {
-    en: {},
-    fr: {}
-}
+type Translations = typeof translationJson;
 
 export function useTranslation() {
     const { isEnglish } = useLanguage();
+    const translations: Translations = translationJson;
 
-    const t = (key: keyof Translation): string => {
-        return isEnglish ? translations.en[key] : translations.fr[key];
+    const t = (key: keyof (typeof translationJson)["en"]): string => {
+        return isEnglish ? translations.en[key] : translations.fr[key]
     };
 
     return t;
