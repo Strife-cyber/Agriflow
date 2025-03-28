@@ -1,11 +1,19 @@
-import appLogo from '@/assets/applogo.svg';
+import appLogo from "@/assets/applogo.svg";
+import cn from "@/utils/class-merge";
 
-export default function AppLogoIcon({ width, height }: {width?: string, height?: string}) {
+interface AppLogoIconProps {
+    width?: number;
+    height?: number;
+}
+
+export default function AppLogoIcon({ width = 16, height = 16 }: AppLogoIconProps) {
     return (
-        <div className={`relative inline-block w-${width || '16'} h-${height || 16} group`}>
+        <div className="relative inline-block group" style={{ width: `${width * 4}px`, height: `${height * 4}px` }}>
             <img 
                 src={appLogo} 
-                className="w-full h-full object-contain"
+                alt="App Logo"
+                className={cn("object-contain")}
+                style={{ width: `${width * 4}px`, height: `${height * 4}px` }}
             />
             <div className="absolute inset-0 -z-10 
                 bg-green-400/0 

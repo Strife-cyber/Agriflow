@@ -3,7 +3,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 
 interface LanguageContextType {
     isEnglish: boolean;
-    toggleLanguage: () => void;
+    toggleLanguage: (english: boolean) => void;
 }
 
 interface LanguageProviderProps {
@@ -22,8 +22,8 @@ export function LanguageProvider({children}: LanguageProviderProps) {
         Cookies.set('language', isEnglish.toString(), { expires: 365 });
     }, [isEnglish]);
 
-    const toggleLanguage = () => {
-        setIsEnglish(prev => !prev);
+    const toggleLanguage = (english: boolean) => {
+        setIsEnglish(english);
     }
 
     const value: LanguageContextType = {
@@ -40,6 +40,9 @@ export function LanguageProvider({children}: LanguageProviderProps) {
 
 export const useLanguage = (): LanguageContextType => {
     const context = useContext(LanguageContext);
-    if (context === undefined) throw new Error('useLanguage must be used within a LanguageProvider');
+    if (context === undefined) {
+        console.error('useLanguage must be used within a LanguageProvider');
+        throw new Error('useLanguage must be used within a LanguageProvider');
+    }
     return context;
 }
