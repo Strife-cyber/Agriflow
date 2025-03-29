@@ -39,10 +39,12 @@ const LanguageCombobox = () => {
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[130px] justify-between border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50"
+          className="md:w-[130px] justify-between border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50"
         >
           <Globe className="mr-2 h-4 w-4 text-emerald-600" />
-          {languages.find((lang) => lang.value === language)?.label || "Select language"}
+          <div className="hidden md:block">
+            {languages.find((lang) => lang.value === language)?.label || "Select language"}
+          </div>
           <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
