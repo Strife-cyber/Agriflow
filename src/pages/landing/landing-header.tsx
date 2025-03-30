@@ -1,30 +1,87 @@
 import AppLogo from "@/components/app-logo";
-import LanguageCombobox from "@/components/language-combobox";
 import { Button } from "@/components/ui/button";
+import { useAnimation, aos } from "@/context/aos";
 import { useTranslation } from "@/context/translation";
+import LanguageCombobox from "@/components/language-combobox";
 
 const LandingHeader = () => {
-    const translation = useTranslation();
+  const translation = useTranslation();
+  useAnimation();
 
-    return (
-        <header className="flex items-center justify-between py-5 px-2 md:px-10">
-            <div>
-                <AppLogo/>
+  return (
+    <header
+      className="bg-gradient-to-b from-gray-900/80 to-emerald-900/20 backdrop-blur-lg py-4 px-6 md:px-12 shadow-xl border-b border-emerald-400/20 fixed w-full top-0 z-50"
+    >
+      <div className="max-w-7xl mx-auto flex items-center justify-between">
+        {/* Logo */}
+        <div
+          data-aos={aos.fadeRight}
+          className="flex items-center gap-2 group"
+        >
+          <AppLogo className="text-emerald-400" />
+        </div>
+
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center gap-8">
+          {["home", "about", "services", "contact"].map((item, i) => (
+            <a
+              key={item}
+              href="#"
+              data-aos={aos.fadeUp}
+              data-aos-delay={100 + i * 50}
+              className="text-sm font-medium text-gray-300 hover:text-white relative
+                         before:absolute before:-bottom-1 before:left-1/2 before:w-0 before:h-px 
+                         before:bg-gradient-to-r from-emerald-400 to-cyan-400 hover:before:w-4/5 
+                         hover:before:left-[10%] before:transition-all before:duration-300"
+            >
+              {translation(item)}
+            </a>
+          ))}
+        </nav>
+
+        {/* Buttons */}
+        <div className="flex items-center gap-4">
+          <div 
+            data-aos={aos.zoomIn}
+            data-aos-delay="400"
+          >
+            <Button
+              className="hidden sm:flex rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 
+                         hover:from-emerald-500 hover:to-cyan-500 text-white px-8 py-6 shadow-lg
+                         hover:shadow-emerald-500/20 transition-all duration-300 relative overflow-hidden"
+            >
+              <span className="relative z-10">{translation("login")}</span>
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </Button>
+          </div>
+          
+          <div
+            data-aos={aos.zoomIn}
+            data-aos-delay="500"
+          >
+            <div className="border border-emerald-400/20 hover:border-emerald-400/40 bg-gray-900/50 backdrop-blur-sm">
+              <LanguageCombobox />
             </div>
-            <nav className="hidden md:flex lg:min-w-[320px] items-center justify-between bg-green-500 text-white rounded-full p-1 px-2 space-x-6">
-                <a href="" className="hover:bg-white hover:text-black rounded-full py-1 px-3">{ translation("home") }</a>
-                <a href="" className="hover:bg-white hover:text-black rounded-full py-1 px-3">{ translation("about") }</a>
-                <a href="" className="hover:bg-white hover:text-black rounded-full py-1 px-3">{ translation("contact") }</a>
-            </nav>
-            <div className="flex items-center space-x-4">
-                <Button
-                    className="border-green-500 text-green-500 hover:bg-green-500 hover:text-white transition-all duration-300 ease-in-out transform hover:scale-105" 
-                    variant="outline"
-                >{ translation("login") }</Button>
-                <LanguageCombobox/>
-            </div>
-        </header>
-    );
-}
+          </div>
+        </div>
+      </div>
+
+      {/* Floating Particles */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-0.5 h-0.5 bg-emerald-400/30 rounded-full animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${i * 0.5}s`
+            }}
+          />
+        ))}
+      </div>
+    </header>
+  );
+};
 
 export default LandingHeader;

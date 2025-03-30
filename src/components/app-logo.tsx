@@ -1,14 +1,20 @@
+import cn from "@/utils/class-merge";
 import AppLogoIcon from "./app-logo-icon";
 
-export default function AppLogo() {
+const AppLogo = ({ className }: { className?: string }) => {
     return (
-        <div className="flex items-center gap-2">
-            <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-md">
+        <div className={cn(
+            "flex items-center gap-2",
+            className
+        )}>
+            <div className="text-sidebar-primary-foreground flex aspect-square size-10 items-center justify-center rounded-md">
                 <AppLogoIcon/>
             </div>
-            <div className="ml-1 grid flex-1 text-left text-sm">
-                <span className="leading-none font-semibold">Agri Flow</span>
+            <div className="ml-1 grid flex-1 text-left text-lg">
+                <span className="leading-none font-bold">Agri Flow</span>
             </div>
         </div>
     );
 }
+
+export default AppLogo;
