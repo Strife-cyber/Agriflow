@@ -1,12 +1,14 @@
 import AppLogo from "@/components/app-logo";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAnimation, aos } from "@/context/aos";
 import { useTranslation } from "@/context/translation";
 import LanguageCombobox from "@/components/language-combobox";
 
 const LandingHeader = () => {
-  const translation = useTranslation();
   useAnimation();
+  const navigate = useNavigate();
+  const translation = useTranslation();
 
   return (
     <header
@@ -49,6 +51,7 @@ const LandingHeader = () => {
               className="hidden sm:flex rounded-xl bg-gradient-to-r from-emerald-600 to-cyan-600 
                          hover:from-emerald-500 hover:to-cyan-500 text-white px-8 py-6 shadow-lg
                          hover:shadow-emerald-500/20 transition-all duration-300 relative overflow-hidden"
+              onClick={() => navigate("/auth")}
             >
               <span className="relative z-10">{translation("login")}</span>
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300" />

@@ -1,12 +1,14 @@
 import HeroImage from "@/assets/heroImage.jpg";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAnimation, aos } from "@/context/aos";
 import { useTranslation } from "@/context/translation";
 import { Card, CardContent } from "@/components/ui/card";
 
 const LandingHero = () => {
-  const translation = useTranslation();
   useAnimation();
+  const navigate = useNavigate();
+  const translation = useTranslation();
 
   return (
     <section className="relative min-h-screen flex items-center bg-gradient-to-br from-gray-900 via-slate-900 to-emerald-900 py-20 overflow-hidden isolate">
@@ -30,7 +32,7 @@ const LandingHero = () => {
             size="lg"
             className="relative overflow-hidden bg-gradient-to-r from-emerald-600 to-cyan-600 hover:to-cyan-500 text-white rounded-xl px-10 py-7 text-lg font-semibold transition-all duration-300 group shadow-2xl hover:shadow-emerald-500/20"
           >
-            <span className="relative z-10">{translation("continue")}</span>
+            <span className="relative z-10" onClick={() => navigate("/auth")}>{translation("continue")}</span>
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-400/20 to-cyan-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             <div className="absolute -inset-1 bg-[conic-gradient(from_90deg_at_50%_50%,#059669_0%,#10b981_50%,#059669_100%)] opacity-0 group-hover:opacity-30 transition-opacity duration-500" />
           </Button>

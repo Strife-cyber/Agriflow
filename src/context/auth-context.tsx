@@ -3,7 +3,7 @@ import { enc } from "crypto-js";
 import { encrypt, decrypt } from "crypto-js/aes";
 import { createContext, ReactNode, useContext, useState } from "react";
 
-interface AuthState {
+export interface AuthState {
     username:   string | null;
     email:      string | null;
     connected:  boolean;
