@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "../firebase-config";
+import { auth, firestore } from "../firebase-config";
 import { useAuth } from "../context/auth-context";
 
 import { 
@@ -9,6 +9,7 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword 
 } from "firebase/auth";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 interface AuthHook {
     registerFunction: (name: string, email: string, password: string) => Promise<boolean>;
@@ -46,16 +47,27 @@ const useAuthHook = (): AuthHook => {
         }
     }
 
-    const loginFunction = async (
-        email: string,
-        password: string
-    ): Promise<boolean> => {
+    const loginFunction = async (email: string, password: string): Promise<boolean> => {
         try {
             setError(null);
-
-            const credentials = await signInWithEmailAndPassword(auth, email, password);
-            login(credentials.user.displayName || '', email);
-
+    
+            // Sign in the user
+            await signInWithEmailAndPassword(auth, email, password);
+    
+            // Fetch user data from Firestore based on email
+            const usersRef = collection(firestore, "users");
+            const q = query(usersRef, where("email", "==", email));
+            const querySnapshot = await getDocs(q);
+    
+            if (!querySnapshot.empty) {
+                const userData = querySnapshot.docs[0].data();
+                login(userData.username || "", email);
+            } else {
+                console.warn("User data not found in Firestore!");
+                setError("User data not found.");
+                return false;
+            }
+    
             return true;
         } catch (error) {
             const authError = error as AuthError;
@@ -63,7 +75,7 @@ const useAuthHook = (): AuthHook => {
             console.error("Login error: ", authError);
             return false;
         }
-    }
+    };
 
     const logoutFunction = async () => logout();
 

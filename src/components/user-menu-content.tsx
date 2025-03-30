@@ -1,9 +1,10 @@
-import { Link, LogOut, Settings } from 'lucide-react';
-import { AuthState } from '@/context/auth-context';
-import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
-import { useMobileNavigation } from '@/utils/use-mobile-navigation';
 import { UserInfo } from './user-info';
+import { Link } from 'react-router-dom';
+import { LogOut, Settings } from 'lucide-react';
+import { AuthState } from '@/context/auth-context';
 import { useTranslation } from '@/context/translation';
+import { useMobileNavigation } from '@/utils/use-mobile-navigation';
+import { DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 
 interface UserMenuContentProps {
     user: AuthState;
@@ -23,7 +24,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href="/profile/edit" onClick={cleanup}>
+                    <Link className="block w-full" to="/profile/edit" onClick={cleanup}>
                         <Settings className="mr-2" />
                         { translation("settings") }
                     </Link>
@@ -31,7 +32,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link className="block w-full" method="post" href="/logout" onClick={cleanup}>
+                <Link className="block w-full" to="/logout" onClick={cleanup}>
                     <LogOut className="mr-2" />
                     { translation("logout") }
                 </Link>

@@ -1,33 +1,39 @@
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-
 import HeadingSmall from '@/components/heading-small';
-
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import useForm from '@/utils/useForm';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const { data, setData, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
+    
+    const [password, setPassword] = useState('');
+    const [errors, setErrors] = useState<{ password?: string }>({});
+    const [processing, setProcessing] = useState(false);
 
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
+        setProcessing(true);
 
-        /*destroy(route('profile.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current?.focus(),
-            onFinish: () => reset(),
-        })*/
+        // Simulated API call
+        setTimeout(() => {
+            if (password !== 'correct_password') { // Replace with actual validation logic
+                setErrors({ password: 'Incorrect password' });
+                passwordInput.current?.focus();
+            } else {
+                alert('Account deleted successfully');
+                closeModal();
+            }
+            setProcessing(false);
+        }, 1000);
     };
 
     const closeModal = () => {
-        clearErrors();
-        reset();
+        setErrors({});
+        setPassword('');
     };
 
     return (
@@ -60,8 +66,8 @@ export default function DeleteUser() {
                                     type="password"
                                     name="password"
                                     ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Password"
                                     autoComplete="current-password"
                                 />
@@ -76,8 +82,8 @@ export default function DeleteUser() {
                                     </Button>
                                 </DialogClose>
 
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
+                                <Button variant="destructive" disabled={processing} type="submit">
+                                    Delete account
                                 </Button>
                             </DialogFooter>
                         </form>

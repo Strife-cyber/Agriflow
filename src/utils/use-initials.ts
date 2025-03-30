@@ -2,7 +2,6 @@ import { useCallback } from "react";
 
 export function useInitials() {
     const getInitials = useCallback((fullName: string): string => {
-        console.log(fullName);
         const names = fullName.trim().split(' ');
 
         if (names.length === 0) return '';

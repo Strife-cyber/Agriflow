@@ -40,25 +40,25 @@ const LanguageCombobox = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="md:w-[140px] justify-between border border-emerald-400/20 hover:border-emerald-400/40 bg-gray-900/50 backdrop-blur-sm rounded-xl px-4 py-5 transition-all duration-300 hover:scale-105"
+            className="md:w-[140px] justify-between border border-emerald-400/50 hover:border-emerald-500 bg-white text-gray-700 rounded-xl px-4 py-5 transition-all duration-300 hover:scale-105"
           >
-            <Globe className="mr-2 h-5 w-5 text-emerald-400" />
-            <div className="hidden md:block text-gray-300 font-medium">
+            <Globe className="mr-2 h-5 w-5 text-emerald-500" />
+            <div className="hidden md:block font-medium">
               {languages.find((lang) => lang.value === language)?.label}
             </div>
-            <ChevronsUpDown className="ml-2 h-4 w-4 text-emerald-400/80" />
+            <ChevronsUpDown className="ml-2 h-4 w-4 text-emerald-500/80" />
           </Button>
         </div>
       </PopoverTrigger>
       
       <PopoverContent 
-        className="w-[140px] p-1.5 border border-emerald-400/20 bg-gray-900/80 backdrop-blur-lg rounded-xl shadow-xl"
+        className="w-[140px] p-1.5 border border-emerald-400/50 bg-white shadow-lg rounded-xl"
         align="end"
         data-aos={aos.zoomIn}
       >
         <Command>
           <CommandList>
-            <CommandEmpty className="text-gray-400 px-2 py-3 text-sm">
+            <CommandEmpty className="text-gray-500 px-2 py-3 text-sm">
               No language found.
             </CommandEmpty>
             <CommandGroup>
@@ -71,15 +71,15 @@ const LanguageCombobox = () => {
                     setOpen(false);
                     toggleLanguage(currentValue === "en");
                   }}
-                  className="group rounded-lg px-3 py-2.5 text-gray-300 hover:bg-gray-800/50 transition-colors duration-200 cursor-pointer"
+                  className="group rounded-lg px-3 py-2.5 text-gray-700 hover:bg-gray-200 transition-colors duration-200 cursor-pointer"
                 >
                   <Check
                     className={cn(
-                      "mr-2 h-4 w-4 text-emerald-400",
+                      "mr-2 h-4 w-4 text-emerald-500",
                       language === lang.value ? "opacity-100" : "opacity-0"
                     )}
                   />
-                  <span className="font-medium group-hover:text-emerald-400 transition-colors">
+                  <span className="font-medium group-hover:text-emerald-500 transition-colors">
                     {lang.label}
                   </span>
                 </CommandItem>

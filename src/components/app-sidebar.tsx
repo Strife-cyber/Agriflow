@@ -1,11 +1,12 @@
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { BookOpen, Folder, LayoutGrid, Link } from 'lucide-react';
+import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
 import { NavItem } from '..';
 import { NavUser } from './nav-user';
 import { NavFooter } from './nav-footer';
 import { NavMain } from './nav-main';
+import { Link } from 'react-router-dom';
 
 const mainNavItems: NavItem[] = [
     {
@@ -35,7 +36,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard">
+                            <Link to="/dashboard">
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

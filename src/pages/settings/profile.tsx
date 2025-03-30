@@ -1,7 +1,4 @@
-import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -11,6 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { useAuth } from '@/context/auth-context';
+import { BreadcrumbItem } from '@/index';
+import { auth } from '@/firebase-config';
+import LanguageCombobox from '@/components/language-combobox';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,25 +26,37 @@ interface ProfileForm {
 }
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
-    const { auth } = usePage<SharedData>().props;
+    document.title = 'Profile settings';
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
-        name: auth.user.name,
-        email: auth.user.email,
+    const { authState } = useAuth();
+
+    const [data, setData] = useState<ProfileForm>({
+        name: authState.username || '',
+        email: authState.email || '',
     });
 
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+    const [errors, setErrors] = useState<Partial<ProfileForm>>({});
+    const [processing, setProcessing] = useState(false);
+    const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
-        patch(route('profile.update'), {
-            preserveScroll: true,
-        });
+    const handleChange = (key: keyof ProfileForm, value: string) => {
+        setData((prev) => ({ ...prev, [key]: value }));
+    };
+
+    const submit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setProcessing(true);
+
+        // Simulate API request
+        setTimeout(() => {
+            setProcessing(false);
+            setRecentlySuccessful(true);
+            setTimeout(() => setRecentlySuccessful(false), 2000);
+        }, 1000);
     };
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Profile settings" />
-
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
@@ -51,49 +64,43 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
-
                             <Input
                                 id="name"
                                 className="mt-1 block w-full"
                                 value={data.name}
-                                onChange={(e) => setData('name', e.target.value)}
+                                onChange={(e) => handleChange('name', e.target.value)}
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
-
                             <InputError className="mt-2" message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
                             <Label htmlFor="email">Email address</Label>
-
                             <Input
                                 id="email"
                                 type="email"
                                 className="mt-1 block w-full"
                                 value={data.email}
-                                onChange={(e) => setData('email', e.target.value)}
+                                onChange={(e) => handleChange('email', e.target.value)}
                                 required
                                 autoComplete="username"
                                 placeholder="Email address"
                             />
-
                             <InputError className="mt-2" message={errors.email} />
                         </div>
 
-                        {mustVerifyEmail && auth.user.email_verified_at === null && (
+                        {mustVerifyEmail && !auth.currentUser?.emailVerified && (
                             <div>
                                 <p className="text-muted-foreground -mt-4 text-sm">
                                     Your email address is unverified.{' '}
-                                    <Link
-                                        href={route('verification.send')}
-                                        method="post"
-                                        as="button"
+                                    <a
+                                        href="/resend-verification"
                                         className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                     >
                                         Click here to resend the verification email.
-                                    </Link>
+                                    </a>
                                 </p>
 
                                 {status === 'verification-link-sent' && (
@@ -106,16 +113,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save</Button>
-
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
-                            >
-                                <p className="text-sm text-neutral-600">Saved</p>
-                            </Transition>
+                            <LanguageCombobox/>
+                            {recentlySuccessful && <p className="text-sm text-neutral-600">Saved</p>}
                         </div>
                     </form>
                 </div>
