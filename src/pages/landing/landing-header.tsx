@@ -38,7 +38,7 @@ const LandingHeader = () => {
                          before:bg-gradient-to-r from-emerald-500 to-cyan-500 hover:before:w-4/5 
                          hover:before:left-[10%] before:transition-all before:duration-300"
             >
-              {translation(item)}
+              {translation(item as any)}
             </a>
           ))}
         </nav>

@@ -35,7 +35,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         email: authState.email || '',
     });
 
-    const [errors, setErrors] = useState<Partial<ProfileForm>>({});
+    const [errors] = useState<Partial<ProfileForm>>({});
     const [processing, setProcessing] = useState(false);
     const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
