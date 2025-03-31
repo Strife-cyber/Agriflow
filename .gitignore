@@ -25,5 +25,5 @@ dist-ssr
 
 # Hide my firebase configuration
 src\firebase-config.ts
-
+.env
 *storybook.log

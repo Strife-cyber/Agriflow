@@ -1,35 +1,46 @@
-
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
-import AppLogo from './app-logo';
 import { NavItem } from '..';
+import AppLogo from './app-logo';
 import { NavUser } from './nav-user';
-import { NavFooter } from './nav-footer';
 import { NavMain } from './nav-main';
 import { Link } from 'react-router-dom';
-
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
-        icon: BookOpen,
-    },
-];
+import { NavFooter } from './nav-footer';
+import { useTranslation } from '@/context/translation';
+import { Bell, Gauge, History, LayoutGrid } from 'lucide-react';
+import { 
+    Sidebar, SidebarContent, 
+    SidebarFooter, SidebarHeader, 
+    SidebarMenu, SidebarMenuButton, SidebarMenuItem 
+} from '@/components/ui/sidebar';
 
 export function AppSidebar() {
+    const translate = useTranslation();
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: translate("dashboard"),
+            href: '/dashboard',
+            icon: LayoutGrid,
+        },
+        {
+            title: translate("limit"),
+            href: '/limit',
+            icon: Gauge
+        },
+        {
+            title: translate("history"),
+            href: '/history',
+            icon: History
+        },
+        {
+            title: translate("notifications"),
+            href: '/notifications',
+            icon: Bell
+        }
+    ];
+    
+    const footerNavItems: NavItem[] = [
+    ];
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>

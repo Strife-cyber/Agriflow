@@ -1,4 +1,6 @@
 import { useState, FormEventHandler, useRef } from "react";
+import { getAuth, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "firebase/auth";
+
 import InputError from "@/components/input-error";
 import AppLayout from "@/layouts/app-layout";
 import SettingsLayout from "@/layouts/settings/layout";
@@ -17,6 +19,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Password() {
+  const auth = getAuth();
+  const user = auth.currentUser; // Get the currently signed-in user
   const passwordInput = useRef<HTMLInputElement>(null);
   const currentPasswordInput = useRef<HTMLInputElement>(null);
 
@@ -31,15 +35,31 @@ export default function Password() {
   const [processing, setProcessing] = useState(false);
   const [recentlySuccessful, setRecentlySuccessful] = useState(false);
 
-  const updatePassword: FormEventHandler = async (e) => {
+  const updatePasswordHandler: FormEventHandler = async (e) => {
     e.preventDefault();
     setProcessing(true);
     setErrors({});
     setRecentlySuccessful(false);
 
+    if (!user) {
+      setErrors({ general: "No user is signed in." });
+      setProcessing(false);
+      return;
+    }
+
+    if (formData.password !== formData.password_confirmation) {
+      setErrors({ password_confirmation: "Passwords do not match." });
+      setProcessing(false);
+      return;
+    }
+
     try {
-      // Simulate a request (replace with actual API call)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Step 1: Reauthenticate the user
+      const credential = EmailAuthProvider.credential(user.email!, formData.current_password);
+      await reauthenticateWithCredential(user, credential);
+
+      // Step 2: Update the password
+      await updatePassword(user, formData.password);
 
       // Reset form after success
       setFormData({
@@ -50,22 +70,13 @@ export default function Password() {
 
       setRecentlySuccessful(true);
     } catch (error: any) {
-      // Simulating server-side validation errors
-      const simulatedErrors = {
-        current_password: "Incorrect current password.",
-        password: "Password must be at least 8 characters.",
-      };
-
-      setErrors(simulatedErrors);
-
-      if (simulatedErrors.password) {
-        setFormData((prev) => ({ ...prev, password: "", password_confirmation: "" }));
-        passwordInput.current?.focus();
-      }
-
-      if (simulatedErrors.current_password) {
-        setFormData((prev) => ({ ...prev, current_password: "" }));
-        currentPasswordInput.current?.focus();
+      console.error(error);
+      if (error.code === "auth/wrong-password") {
+        setErrors({ current_password: "Incorrect current password." });
+      } else if (error.code === "auth/weak-password") {
+        setErrors({ password: "Password must be at least 6 characters." });
+      } else {
+        setErrors({ general: "Failed to update password. Please try again." });
       }
     }
 
@@ -81,7 +92,10 @@ export default function Password() {
             description="Ensure your account is using a long, random password to stay secure"
           />
 
-          <form onSubmit={updatePassword} className="space-y-6">
+          <form onSubmit={updatePasswordHandler} className="space-y-6">
+            {/* Error Messages */}
+            {errors.general && <p className="text-red-500">{errors.general}</p>}
+
             {/* Current Password */}
             <div className="grid gap-2">
               <Label htmlFor="current_password">Current password</Label>
@@ -132,8 +146,7 @@ export default function Password() {
             {/* Save Button */}
             <div className="flex items-center gap-4">
               <Button disabled={processing}>{processing ? "Saving..." : "Save password"}</Button>
-
-              {recentlySuccessful && <p className="text-sm text-neutral-600">Saved</p>}
+              {recentlySuccessful && <p className="text-sm text-green-600">Password updated successfully!</p>}
             </div>
           </form>
         </div>

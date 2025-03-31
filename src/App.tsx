@@ -1,6 +1,6 @@
-import './App.css'
 import Profile from './pages/settings/profile';
 import LoginPage from './pages/auth/login-page';
+import Password from './pages/settings/password';
 import Dashboard from './pages/dashboard/dashboard';
 import { AuthProvider } from './context/auth-context';
 import LandingPage from './pages/landing/landing-page';
@@ -8,7 +8,6 @@ import ResetPassword from './pages/auth/reset-password';
 import ForgotPassword from './pages/auth/forgot-password';
 import { LanguageProvider } from './context/language-context';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Password from './pages/settings/password';
 
 function App() {
 

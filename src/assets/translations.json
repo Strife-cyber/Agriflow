@@ -107,7 +107,17 @@
         "sendPasswordReset": "Send Password Reset Link",
         "passwordResetEmailSent": "A password reset link has been sent to your email.",
         "errorSendingEmail": "Error sending reset email. Please try again.",
-        "orReturnTo": "Or, return to"
+        "orReturnTo": "Or, return to",
+        "history": "History",
+        "limit": "Limits",
+        "feelsLike": "Feels like",
+        "humidity": "Humidity",
+        "wind": "Wind",
+        "visibility": "Visibility",
+        "pressure": "Pressure",
+        "clouds": "Clouds",
+        "sunrise": "Sunrise",
+        "sunset": "Sunset"
     },
     "fr": {
         "about": "À propos",
@@ -217,6 +227,16 @@
         "sendPasswordReset": "Envoyer le lien de réinitialisation",
         "passwordResetEmailSent": "Un lien de réinitialisation du mot de passe a été envoyé à votre e-mail.",
         "errorSendingEmail": "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
-        "orReturnTo": "Ou, retournez à"
+        "orReturnTo": "Ou, retournez à",
+        "history": "Historique",
+        "limit": "Seuils",
+        "feelsLike": "Ressenti",
+        "humidity": "Humidité",
+        "wind": "Vent",
+        "visibility": "Visibilité",
+        "pressure": "Pression",
+        "clouds": "Nuages",
+        "sunrise": "Lever du soleil",
+        "sunset": "Coucher du soleil"
     }
 }
