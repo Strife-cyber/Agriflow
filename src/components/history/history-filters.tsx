@@ -12,7 +12,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 export interface HistoryFilters {
   search: string
-  dateRange: DateRange | undefined
+  dateRange?: DateRange
   categories: EventCategory[]
   severities: EventSeverity[]
   locations: string[]

@@ -14,8 +14,8 @@ interface SoilHumidityThresholdsProps {
 }
 
 export function SoilHumidityThresholds({
-  defaultLowThreshold = 30,
-  defaultHighThreshold = 70,
+  //defaultLowThreshold = 30,
+  //defaultHighThreshold = 70,
   onThresholdChange,
   className,
 }: SoilHumidityThresholdsProps) {

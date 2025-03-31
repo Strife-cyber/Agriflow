@@ -24,7 +24,7 @@ export function LuminosityThresholds({
   className,
 }: LuminosityThresholdsProps) {
   const [enableAlerts, setEnableAlerts] = useState(true)
-  const [unit, setUnit] = useState<"%" | "lux">("%")
+  const [_, setUnit] = useState<"%" | "lux">("%")
 
   const handleThresholdChangePercent = (low: number, high: number) => {
     if (enableAlerts) {
