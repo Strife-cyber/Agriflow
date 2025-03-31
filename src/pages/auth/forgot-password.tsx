@@ -10,6 +10,7 @@ import AuthLayout from "@/layouts/auth-layout";
 import { useTranslation } from "@/context/translation";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/firebase-config";
+import { appUrl } from "@/context/configs";
 
 export default function ForgotPassword({ status }: { status?: string }) {
     const translate = useTranslation();
@@ -27,7 +28,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         try {
             // Simulate API request
             await sendPasswordResetEmail(auth, email, {
-                url: "http://localhost:5173/password-reset"// correct this later
+                url: `${appUrl}/password-reset`// correct this later
             });
             setMessage(translate("passwordResetEmailSent"));
         } catch (err: any) {

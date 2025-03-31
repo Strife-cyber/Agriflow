@@ -1,0 +1,1 @@
+export const appUrl = "https://agriflow-570e4.web.app";
