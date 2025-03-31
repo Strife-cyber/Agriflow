@@ -117,7 +117,13 @@
         "pressure": "Pressure",
         "clouds": "Clouds",
         "sunrise": "Sunrise",
-        "sunset": "Sunset"
+        "sunset": "Sunset",
+        "updated": "Updated",
+        "co2Level": "CO₂ Level",
+        "luminosity": "Luminosity",
+        "soilHumidity": "Soil Humidity",
+        "temperature": "Temperature",
+        "waterTankLevel": "Water Tank Level"
     },
     "fr": {
         "about": "À propos",
@@ -237,6 +243,12 @@
         "pressure": "Pression",
         "clouds": "Nuages",
         "sunrise": "Lever du soleil",
-        "sunset": "Coucher du soleil"
+        "sunset": "Coucher du soleil",
+        "updated": "Mis à jour",
+        "co2Level": "Niveau de CO₂",
+        "luminosity": "Luminosité",
+        "soilHumidity": "Humidité du sol",
+        "temperature": "Température",
+        "waterTankLevel": "Niveau du réservoir d'eau"
     }
 }
