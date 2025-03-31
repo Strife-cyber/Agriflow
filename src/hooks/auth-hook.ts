@@ -34,7 +34,7 @@ const useAuthHook = (): AuthHook => {
             const credentials = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(credentials.user, { displayName: name });
             await addDoc(collection(firestore, "users"), {
-                name: name,
+                username: name,
                 email: email,
                 role: role
             })
