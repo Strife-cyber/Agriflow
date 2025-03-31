@@ -33,7 +33,6 @@ const useAuthHook = (): AuthHook => {
             const credentials = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(credentials.user, { displayName: name });
 
-            login(name, email);
             await sendEmailVerification(credentials.user, {
                 url: ''
             });
@@ -73,7 +72,7 @@ const useAuthHook = (): AuthHook => {
     
             // Retrieve user data
             const userData = querySnapshot.docs[0].data();
-            login(userData.username || "", email);
+            login(userData.username || "", email, userData.role === "admin");
     
             return true;
         } catch (error) {

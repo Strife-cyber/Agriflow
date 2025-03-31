@@ -6,12 +6,13 @@ import { createContext, ReactNode, useContext, useState } from "react";
 export interface AuthState {
     username:   string | null;
     email:      string | null;
+    admin:      boolean;
     connected:  boolean;
 }
 
 interface AuthContextType {
     authState: AuthState;
-    login: (username: string, email: string) => void;
+    login: (username: string, email: string, admin: boolean) => void;
     logout: () => void;
 }
 
@@ -43,9 +44,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
     });
 
-    const login = (username: string, email: string) => {
+    const login = (username: string, email: string, admin: boolean) => {
         const newState: AuthState = {
-            username, email, connected: true
+            username, email, admin, connected: true
         }
 
         const encryptedData = encrypt(JSON.stringify(newState), ENCRYPTION_KEY).toString();
@@ -63,6 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setAuthState({
             username: null,
             email: null,
+            admin: false,
             connected: false
         })
     }
