@@ -9,10 +9,10 @@ import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword 
 } from "firebase/auth";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import { addDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 interface AuthHook {
-    registerFunction: (name: string, email: string, password: string) => Promise<boolean>;
+    registerFunction: (name: string, email: string, password: string, role: string) => Promise<boolean>;
     loginFunction: (email: string, password: string) => Promise<boolean>;
     logoutFunction: () => void;
     error: string | null;
@@ -25,17 +25,21 @@ const useAuthHook = (): AuthHook => {
     const registerFunction = async(
         name: string, 
         email: string, 
-        password: string
+        password: string,
+        role: string
     ): Promise<boolean> => {
         try {
             setError(null);
 
             const credentials = await createUserWithEmailAndPassword(auth, email, password);
             await updateProfile(credentials.user, { displayName: name });
+            await addDoc(collection(firestore, "users"), {
+                name: name,
+                email: email,
+                role: role
+            })
 
-            await sendEmailVerification(credentials.user, {
-                url: ''
-            });
+            await sendEmailVerification(credentials.user);
 
             return true
         } catch (error) {

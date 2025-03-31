@@ -1,3 +1,4 @@
+import Admin from './pages/dashboard/admin';
 import Limits from './pages/dashboard/limit';
 import Profile from './pages/settings/profile';
 import LoginPage from './pages/auth/login-page';
@@ -18,6 +19,7 @@ function App() {
       <LanguageProvider>
         <Router>
           <Routes>
+            <Route path='/admin' element={<Admin/>}/>
             <Route path='/' element={<LandingPage/>}/>
             <Route path='/limit' element={<Limits/>}/>
             <Route path='/auth' element={<LoginPage/>}/>

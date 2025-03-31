@@ -4,8 +4,9 @@ import { NavUser } from './nav-user';
 import { NavMain } from './nav-main';
 import { Link } from 'react-router-dom';
 import { NavFooter } from './nav-footer';
+import { useAuth } from '@/context/auth-context';
 import { useTranslation } from '@/context/translation';
-import { Bell, Gauge, History, LayoutGrid } from 'lucide-react';
+import {Gauge, History, LayoutGrid, UserCog2Icon } from 'lucide-react';
 import { 
     Sidebar, SidebarContent, 
     SidebarFooter, SidebarHeader, 
@@ -13,6 +14,7 @@ import {
 } from '@/components/ui/sidebar';
 
 export function AppSidebar() {
+    const { authState } = useAuth();
     const translate = useTranslation();
 
     const mainNavItems: NavItem[] = [
@@ -30,12 +32,12 @@ export function AppSidebar() {
             title: translate("history"),
             href: '/history',
             icon: History
-        },
-        {
-            title: translate("notifications"),
-            href: '/notifications',
-            icon: Bell
-        }
+        },  
+        ...(authState.admin ? [{
+            title: 'Admin',
+            href: '/admin',
+            icon: UserCog2Icon
+        }] : [])
     ];
     
     const footerNavItems: NavItem[] = [
