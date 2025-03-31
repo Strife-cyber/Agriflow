@@ -11,37 +11,69 @@ import AppLogoIcon from "@/components/app-logo-icon";
 import { useTranslation } from "@/context/translation";
 
 export default function LoginPage() {
-    useAnimation()
+    useAnimation();
     const navigate = useNavigate();
     const translate = useTranslation();
-    const { loginFunction } = useAuthHook();
-    const [isLoading, setIsLoading] = useState(false)
-
+    const { loginFunction, error } = useAuthHook();
+    
+    const [isLoading, setIsLoading] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setTimeout(async () => {
-            await loginFunction(email, password);
-            setIsLoading(false)
-        }, 1500)
-        navigate("/dashboard")
-    }
+        e.preventDefault();
+        setIsLoading(true);
+        setErrorMessage(null); // Reset previous errors
+
+        try {
+            if (await loginFunction(email, password)) {            
+                navigate("/dashboard");
+            } else {
+                setErrorMessage(error);
+            }
+        } catch (error: any) {
+            console.error("Login Error:", error); // Log error for debugging
+            
+            // Extract user-friendly error message
+            let message = "An unknown error occurred. Please try again.";
+            if (error.code) {
+                switch (error.code) {
+                    case "auth/invalid-email":
+                        message = "Invalid email format.";
+                        break;
+                    case "auth/user-not-found":
+                        message = "No account found with this email.";
+                        break;
+                    case "auth/wrong-password":
+                        message = "Incorrect password. Please try again.";
+                        break;
+                    case "auth/too-many-requests":
+                        message = "Too many failed attempts. Try again later.";
+                        break;
+                    default:
+                        message = error.message || message;
+                }
+            }
+            setErrorMessage(message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
-        <div className="min-h-screen w-full flex flex-col md:flex-row bg-gray-900 overflow-hidden">
+        <div className="min-h-screen w-full flex flex-col md:flex-row bg-white overflow-hidden">
             {/* Left side - Form */}
-            <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-12 relative isolate overflow-hidden">
-                {/* Holographic Grid Background */}
+            <div className="w-full md:w-1/2 flex flex-col justify-center items-center p-6 md:p-12 relative">
+                
+                {/* Light Grid Background */}
                 <div className="absolute inset-0 z-[-2] opacity-20">
                     <div className="absolute inset-0 bg-[radial-gradient(#059669_1px,transparent_1px)] [background-size:16px_16px]">
-                        <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900" />
+                        <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
                     </div>
                 </div>
 
-                {/* Floating Nanotech Particles */}
+                {/* Floating Particles */}
                 <div className="absolute inset-0 z-[-1] pointer-events-none">
                     {[...Array(50)].map((_, i) => (
                         <div
@@ -58,34 +90,35 @@ export default function LoginPage() {
                 </div>
 
                 {/* Form Container */}
-                <div className="w-full max-w-md space-y-8 backdrop-blur-xl bg-gray-900/20 p-10 rounded-[2.5rem] border-2 border-emerald-400/20 shadow-2xl shadow-emerald-900/30 hover:shadow-emerald-900/50 transition-all duration-500 group/form"
+                <div className="w-full max-w-md space-y-8 backdrop-blur-xl bg-white/80 p-10 rounded-[2.5rem] border border-gray-300 shadow-lg"
                     data-aos={aos.fadeRight}>
                     
-                    {/* Glowing Border Effect */}
-                    <div className="absolute inset-0 rounded-[2.5rem] border-[1px] border-emerald-400/10 pointer-events-none" />
-                    <div className="absolute inset-0 rounded-[2.5rem] bg-[radial-gradient(400px_at_50%_120%,rgba(16,185,129,0.15),transparent)] pointer-events-none" />
-
+                    {/* Logo */}
                     <div className="flex flex-col items-center space-y-6">
-                        <div 
-                            className="mb-4"
-                        >
+                        <div className="mb-4">
                             <AppLogoIcon />
                         </div>
-                        <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-[linear-gradient(45deg,#6EE7B7,#34D399,#10B981)] animate-text-shine text-center">
-                            Agricultural Intelligence Portal
+                        <h1 className="text-4xl font-bold text-gray-700 text-center">
+                            AgriFlow
                         </h1>
                     </div>
+
+                    {errorMessage && (
+                        <p className="text-red-600 text-center text-sm bg-red-100 p-3 rounded-lg">
+                            {errorMessage}
+                        </p>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-8">
                         <div className="space-y-6">
                             {/* Email Input */}
                             <div className="space-y-4">
-                                <Label htmlFor="email" className="text-sm font-medium text-emerald-300/90 uppercase tracking-widest">
+                                <Label htmlFor="email" className="text-sm font-medium text-gray-700 uppercase tracking-widest">
                                     {translate('email')}
                                 </Label>
                                 <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-emerald-400/80 group-hover/input:text-cyan-400 transition-colors" />
+                                        <Mail className="h-5 w-5 text-gray-500" />
                                     </div>
                                     <input
                                         id="email"
@@ -93,7 +126,7 @@ export default function LoginPage() {
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="innovator@agriflow.com"
-                                        className="w-full pl-12 p-3 bg-gray-800 border border-emerald-400 rounded-lg text-white"
+                                        className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg text-gray-700 focus:border-emerald-500"
                                         required
                                     />
                                 </div>
@@ -102,18 +135,16 @@ export default function LoginPage() {
                             {/* Password Input */}
                             <div className="space-y-4">
                                 <div className="flex items-center justify-between">
-                                    <Label htmlFor="password" className="text-sm font-medium text-emerald-300/90 uppercase tracking-widest">
+                                    <Label htmlFor="password" className="text-sm font-medium text-gray-700 uppercase tracking-widest">
                                         {translate('password')}
                                     </Label>
-                                    <a href="/forgot-password" className="text-sm font-medium text-emerald-400/90 hover:text-cyan-400 transition-colors group/link">
-                                        <span className="bg-gradient-to-r from-emerald-400 to-emerald-400 bg-[length:0%_2px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 group-hover/link:bg-[length:100%_2px]">
-                                            {translate('forgotPassword')}
-                                        </span>
+                                    <a href="/forgot-password" className="text-sm font-medium text-emerald-600 hover:text-emerald-500">
+                                        {translate('forgotPassword')}
                                     </a>
                                 </div>
-                                <div className="relative group/input">
+                                <div className="relative">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-emerald-400/80 group-hover/input:text-cyan-400 transition-colors" />
+                                        <Lock className="h-5 w-5 text-gray-500" />
                                     </div>
                                     <input
                                         id="password"
@@ -121,7 +152,7 @@ export default function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         placeholder="••••••••"
-                                        className="w-full pl-12 p-3 bg-gray-800 border border-emerald-400 rounded-lg text-white"
+                                        className="w-full pl-12 p-3 bg-white border border-gray-300 rounded-lg text-gray-700 focus:border-emerald-500"
                                         required
                                     />
                                 </div>
@@ -131,9 +162,9 @@ export default function LoginPage() {
                             <div className="flex items-center space-x-3">
                                 <Checkbox 
                                     id="remember" 
-                                    className="h-6 w-6 border-2 border-emerald-400/30 data-[state=checked]:bg-emerald-500/90 transition-all hover:border-cyan-400/50" 
+                                    className="h-6 w-6 border-2 border-gray-400 checked:border-emerald-500 transition-all" 
                                 />
-                                <Label htmlFor="remember" className="text-sm font-medium text-emerald-300/90">
+                                <Label htmlFor="remember" className="text-sm font-medium text-gray-700">
                                     {translate('rememberMe')}
                                 </Label>
                             </div>
@@ -142,17 +173,16 @@ export default function LoginPage() {
                         {/* Submit Button */}
                         <Button
                             type="submit"
-                            className="w-full bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500/90 hover:to-cyan-500/90 text-white font-semibold py-5 rounded-md shadow-xl hover:shadow-2xl hover:shadow-emerald-500/30 transition-all duration-300 relative overflow-hidden group/button"
+                            className="w-full bg-emerald-500 hover:bg-emerald-400 text-white font-semibold py-4 rounded-md transition-all"
                             disabled={isLoading}
                         >
-                            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.1)_50%,transparent_75%)] opacity-0 group-hover/button:opacity-100 group-hover/button:animate-shine" />
                             {isLoading ? (
                                 <div className="flex items-center justify-center space-x-3">
-                                    <div className="animate-spin rounded-full h-6 w-6 border-[3px] border-white/80 border-t-transparent" />
-                                    <span className="text-lg">{translate('authenticating')}...</span>
+                                    <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/80 border-t-transparent" />
+                                    <span className="text-sm">{translate('authenticating')}...</span>
                                 </div>
                             ) : (
-                                <span className="text-lg bg-clip-text text-transparent bg-[linear-gradient(45deg,#E5F9ED,#A7F3D0,#6EE7B7)]">
+                                <span className="text-sm">
                                     {translate("login")}
                                 </span>
                             )}
@@ -162,10 +192,10 @@ export default function LoginPage() {
                     {/* Divider */}
                     <div className="relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-emerald-400/20" />
+                            <div className="w-full border-t border-gray-300" />
                         </div>
                         <div className="relative flex justify-center">
-                            <span className="px-4 bg-gray-900/50 text-emerald-400/80 text-sm font-medium tracking-widest rounded-full border border-emerald-400/20">
+                            <span className="px-4 bg-white text-gray-600 text-sm font-medium tracking-widest">
                                 {translate('cultivatingFuture')}
                             </span>
                         </div>
@@ -173,37 +203,15 @@ export default function LoginPage() {
                 </div>
             </div>
 
-            {/* Right side - Immersive Visual */}
-            <div className="hidden md:block md:w-1/2 relative bg-gray-800 overflow-hidden">
-                {/* Background Image */}
+            {/* Right side - Image */}
+            <div className="hidden md:block md:w-1/2 relative bg-gray-100 overflow-hidden">
                 <img
                     src={LoginImage}
-                    alt="Holographic interface overlaying agricultural fields with drone swarm"
-                    className="absolute inset-0 w-full h-full object-cover transform scale-[1.02] saturate-150 contrast-125"
+                    alt="Agriculture AI Dashboard"
+                    className="absolute inset-0 w-full h-full object-cover"
                 />
-                
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900/80 via-emerald-900/40 to-cyan-900/30" />
-
-                {/* Floating Data Visualization */}
-                <div className="absolute inset-0 animate-float-slow">
-                    <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-[url('/grid-pattern.svg')] opacity-20" />
-                    <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-[url('/wave-pattern.svg')] opacity-15" />
-                </div>
-
-                {/* Content Overlay */}
-                <div className="absolute inset-0 flex flex-col justify-center items-center p-12 backdrop-blur-sm">
-                    <div className="max-w-2xl text-center bg-gray-900/40 p-10 rounded-[2rem] border-2 border-emerald-400/20 shadow-2xl shadow-emerald-900/30"
-                        data-aos={aos.fadeLeft}>
-                        <h2 className="text-5xl font-bold bg-clip-text text-transparent bg-[linear-gradient(45deg,#6EE7B7,#34D399,#10B981)] mb-8 leading-tight">
-                            {translate('nextGenAgriculture')}
-                        </h2>
-                        <p className="text-xl text-emerald-100/90 leading-relaxed tracking-wide">
-                            {translate('joinEcosystem')}
-                        </p>
-                    </div>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-br from-white via-gray-300 to-gray-100 opacity-50" />
             </div>
         </div>
-    )
+    );
 }

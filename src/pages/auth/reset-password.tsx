@@ -1,96 +1,107 @@
-import { LoaderCircle } from 'lucide-react';
-import { FormEventHandler } from 'react';
+import { useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { getAuth, confirmPasswordReset } from "firebase/auth";
+import { LoaderCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import AuthLayout from "@/layouts/auth-layout";
 
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import AuthLayout from '@/layouts/auth-layout';
-import useForm from '@/utils/useForm';
-import Head from '@/utils/head';
+export default function ResetPassword() {
+    const auth = getAuth();
+    const [searchParams] = useSearchParams();
+    const oobCode = searchParams.get("oobCode"); // Extract reset token from URL
 
-interface ResetPasswordProps {
-    token: string;
-    email: string;
-}
+    const [email, setEmail] = useState(""); // Email is optional, but can be pre-filled if needed
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [processing, setProcessing] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
 
-type ResetPasswordForm = {
-    token: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-};
-
-export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
-        token: token,
-        email: email,
-        password: '',
-        password_confirmation: '',
-    });
-
-    const submit: FormEventHandler = (e) => {
+    const submit: React.FormEventHandler = async (e) => {
         e.preventDefault();
-        /*post(route('password.store'), {
-            onFinish: () => reset('password', 'password_confirmation'),
-        });*/
+        setProcessing(true);
+        setError(null);
+        setMessage(null);
+
+        if (!oobCode) {
+            setError("Invalid or expired reset link.");
+            setProcessing(false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            setError("Passwords do not match.");
+            setProcessing(false);
+            return;
+        }
+
+        try {
+            await confirmPasswordReset(auth, oobCode, password);
+            setMessage("Password reset successful! You can now log in.");
+        } catch (err) {
+            setError("Failed to reset password. Please try again.");
+        } finally {
+            setProcessing(false);
+        }
     };
 
     return (
         <AuthLayout title="Reset password" description="Please enter your new password below">
-            <Head title="Reset password" />
+            <head title="Reset password" />
 
             <form onSubmit={submit}>
                 <div className="grid gap-6">
+                    {message && <p className="text-green-600">{message}</p>}
+                    {error && <p className="text-red-600">{error}</p>}
+
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">Email (optional)</Label>
                         <Input
                             id="email"
                             type="email"
                             name="email"
                             autoComplete="email"
-                            value={data.email}
+                            value={email}
                             className="mt-1 block w-full"
-                            readOnly
-                            onChange={(e) => setData('email', e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Enter your email (if needed)"
                         />
-                        <InputError message={errors.email} className="mt-2" />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">New Password</Label>
                         <Input
                             id="password"
                             type="password"
                             name="password"
                             autoComplete="new-password"
-                            value={data.password}
+                            value={password}
                             className="mt-1 block w-full"
                             autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
-                            placeholder="Password"
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Enter new password"
                         />
-                        <InputError message={errors.password} />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm password</Label>
+                        <Label htmlFor="password_confirmation">Confirm New Password</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
                             name="password_confirmation"
                             autoComplete="new-password"
-                            value={data.password_confirmation}
+                            value={confirmPassword}
                             className="mt-1 block w-full"
-                            onChange={(e) => setData('password_confirmation', e.target.value)}
-                            placeholder="Confirm password"
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm new password"
                         />
-                        <InputError message={errors.password_confirmation} className="mt-2" />
                     </div>
 
                     <Button type="submit" className="mt-4 w-full" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                        Reset password
+                        Reset Password
                     </Button>
                 </div>
             </form>

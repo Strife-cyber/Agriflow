@@ -102,8 +102,12 @@
         "Privacy": "Privacy",
         "Terms": "Terms",
         "Copyright": "Copyright",
-        "License": "License"
-
+        "License": "License",
+        "forgotPasswordDescription": "Enter your email to receive a password reset link",
+        "sendPasswordReset": "Send Password Reset Link",
+        "passwordResetEmailSent": "A password reset link has been sent to your email.",
+        "errorSendingEmail": "Error sending reset email. Please try again.",
+        "orReturnTo": "Or, return to"
     },
     "fr": {
         "about": "À propos",
@@ -208,7 +212,11 @@
         "Privacy": "Confidentialité",
         "Terms": "Conditions",
         "Copyright": "Droits d'auteur",
-        "License": "Licence"
-          
+        "License": "Licence",
+        "forgotPasswordDescription": "Entrez votre email pour recevoir un lien de réinitialisation du mot de passe",
+        "sendPasswordReset": "Envoyer le lien de réinitialisation",
+        "passwordResetEmailSent": "Un lien de réinitialisation du mot de passe a été envoyé à votre e-mail.",
+        "errorSendingEmail": "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
+        "orReturnTo": "Ou, retournez à"
     }
 }
