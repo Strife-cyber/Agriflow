@@ -1,29 +1,34 @@
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/index';
+import { useTranslation } from '@/context/translation';
 import { WeatherCard } from '@/components/weather-card';
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import { SensorBoard } from '@/components/sensor-board';
-
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-    },
-];
+import { useLanguage } from '@/context/language-context';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 
 export default function Dashboard() {
+    const { isEnglish } = useLanguage();
+    const translation = useTranslation();
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: translation("dashboard"),
+            href: '/dashboard',
+        },
+    ];
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="flex h-full flex-1 flex-col gap-4 rounded-xl p-4">
                 <div className="mb-6">
                     <h2 className='text-2xl font-bold text-black mb-4'>
-                        Weather Info
+                        { isEnglish ? "Weather Info" : "Climat Actuel" }
                     </h2>
                     <WeatherCard/>
                 </div>
                 <div>
                     <h2 className='text-2xl font-bold text-black mb-4'>
-                        Field Sensors
+                        { isEnglish ? "Field Sensors" : "Les Capteurs" }
                     </h2>
                     <SensorBoard/>
                 </div>

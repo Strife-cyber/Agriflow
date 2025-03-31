@@ -1,3 +1,4 @@
+import Limits from './pages/dashboard/limit';
 import Profile from './pages/settings/profile';
 import LoginPage from './pages/auth/login-page';
 import Password from './pages/settings/password';
@@ -17,6 +18,7 @@ function App() {
         <Router>
           <Routes>
             <Route path='/' element={<LandingPage/>}/>
+            <Route path='/limit' element={<Limits/>}/>
             <Route path='/auth' element={<LoginPage/>}/>
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/settings/password' element={<Password/>}/>

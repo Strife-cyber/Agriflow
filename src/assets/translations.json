@@ -123,7 +123,17 @@
         "luminosity": "Luminosity",
         "soilHumidity": "Soil Humidity",
         "temperature": "Temperature",
-        "waterTankLevel": "Water Tank Level"
+        "waterTankLevel": "Water Tank Level",
+        "low": "Low Threshold",
+        "high": "High Threshold",
+        "saved": "Settings saved successfully",
+        "title": "Current Alert Thresholds",
+        "temperatureThresholdsTitle": "Temperature thresholds",
+        "temperatureThresholdsAlerts": "Alerts",
+        "temperatureThresholdsRange": "Temperature range",
+        "temperatureThresholdsDescription": "Define the temperature range for optimal plant growth. Alerts will be signalled once the temperature falls our of this range.",
+        "temperatureThresholdsRiskCold": "Below {{value}}°C : Damage risks due to cold",
+        "temperatureThresholdsRiskHeat": "Above {{value}}°C : Damage risks due to excessive heat"
     },
     "fr": {
         "about": "À propos",
@@ -249,6 +259,16 @@
         "luminosity": "Luminosité",
         "soilHumidity": "Humidité du sol",
         "temperature": "Température",
-        "waterTankLevel": "Niveau du réservoir d'eau"
+        "waterTankLevel": "Niveau du réservoir d'eau",
+        "low": "Seuil bas",
+        "high": "Seuil haut",
+        "saved": "Paramètres enregistrés avec succès",
+        "title": "Seuils d'alerte actuels",
+        "temperatureThresholdsTitle": "Seuils de Température",
+        "temperatureThresholdsAlerts": "Alertes",
+        "temperatureThresholdsRange": "Plage de Température",
+        "temperatureThresholdsDescription": "Définissez les seuils de température pour une croissance optimale des plantes. Des alertes seront déclenchées lorsque la température sortira de cette plage.",
+        "temperatureThresholdsRiskCold": "En dessous de {{value}}°C : Risque de dommages dus au froid",
+        "temperatureThresholdsRiskHeat": "Au-dessus de {{value}}°C : Risque de stress thermique"
     }
 }
