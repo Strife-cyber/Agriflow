@@ -20,5 +20,6 @@ export const aos = {
   zoomIn: "zoom-in",
   slideLeft: "slide-left",
   slideUp: "fade-up",
-  fadeDown: "fade-down"
+  fadeDown: "fade-down",
+  fadeIn: "fade-in",
 } as const;

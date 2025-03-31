@@ -162,3 +162,26 @@
 @keyframes text-shine {
   to { background-position: 200% center; }
 }
+
+
+@keyframes ripple {
+  0% { 
+    transform: scaleX(1.5) translateY(0); 
+    opacity: 1; 
+    height: 4px;
+  }
+  50% { 
+    transform: scaleX(3) translateY(-2px); 
+    opacity: 0.3; 
+    height: 10px;
+  }
+  100% { 
+    transform: scaleX(1.5) translateY(0); 
+    opacity: 1; 
+    height: 4px;
+  }
+}
+
+.animate-ripple {
+  animation: ripple 2s infinite ease-in-out;
+}

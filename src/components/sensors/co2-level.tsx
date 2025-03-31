@@ -27,7 +27,7 @@ export function CO2Level({ value, className, lastUpdated }: CO2LevelProps) {
 
   // Normalize value for the gauge (0-100%)
   const normalizedValue = (value / maxValue) * 100
-  const needleAngle = -120 + (normalizedValue / 100) * 240
+  const needleAngle = -810 + (normalizedValue / 100) * 270
 
   // Color based on CO2 level
   const getColor = (co2Level: number) => {
@@ -101,7 +101,7 @@ export function CO2Level({ value, className, lastUpdated }: CO2LevelProps) {
 
             {/* Zone markers */}
             {[0, 25, 50, 75, 100].map((percent) => {
-              const angle = -120 + (percent / 100) * 240
+              const angle = -180 + (percent / 100) * 270
               const x = 80 * Math.cos((angle * Math.PI) / 180)
               const y = 80 * Math.sin((angle * Math.PI) / 180)
               const markerValue = (percent / 100) * maxValue
@@ -129,7 +129,7 @@ export function CO2Level({ value, className, lastUpdated }: CO2LevelProps) {
                     y={y * 1.15}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fill="#6b7280" // Gray for contrast
+                    fill="#6b7280"
                     fontSize="8"
                   >
                     {Math.round(markerValue)}
@@ -147,8 +147,6 @@ export function CO2Level({ value, className, lastUpdated }: CO2LevelProps) {
               stroke="#10b981" // Green tint
               strokeWidth="2"
               transform={`rotate(${needleAngle})`}
-              data-aos={aos.fadeUp} // Needle fades up
-              data-aos-delay="200"
             />
 
             {/* Center circle */}
@@ -157,21 +155,19 @@ export function CO2Level({ value, className, lastUpdated }: CO2LevelProps) {
 
           {/* Value display */}
           <div
-            className="absolute bottom-0 left-0 right-0 text-center"
+            className="absolute bottom-10 left-0 right-0 text-center"
             data-aos={aos.fadeUp}
             data-aos-delay="300"
           >
-            <span className="text-3xl font-bold" style={{ color }}>
+            <span className="text-2xl font-bold" style={{ color }}>
               {Math.round(value)}
             </span>
-            <span className="text-lg text-green-700 ml-1">ppm</span>
+            <span className="text-md text-green-700 ml-1">ppm</span>
           </div>
         </div>
 
         <div
           className={cn("mt-2 text-lg font-medium", status.color)}
-          data-aos={aos.fadeUp}
-          data-aos-delay="400"
         >
           {status.label}
         </div>

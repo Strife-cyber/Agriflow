@@ -36,7 +36,7 @@ export function TemperatureGauge({
   const arcPath = `M -80 0 A ${r} ${r} 0 ${progress > 0.5 ? 1 : 0} 1 ${x * r} ${y * r}`
 
   // Needle rotation
-  const needleAngle = -135 + progress * 270
+  const needleAngle = -50 + progress * 270
 
   useEffect(() => {
     if (value !== prevValue) {
@@ -129,8 +129,6 @@ export function TemperatureGauge({
               stroke="#10b981" // Green tint
               strokeWidth="2"
               transform={`rotate(${needleAngle})`}
-              data-aos={aos.fadeUp}
-              data-aos-delay="300"
             />
 
             {/* Center circle */}
@@ -146,14 +144,14 @@ export function TemperatureGauge({
 
           {/* Value display */}
           <div
-            className="absolute bottom-4 left-0 right-0 text-center"
+            className="absolute bottom-10 left-0 right-0 text-center"
             data-aos={aos.fadeUp}
             data-aos-delay="400"
           >
-            <span className="text-3xl font-bold text-green-800">
+            <span className="text-2xl font-bold text-green-800">
               {value.toFixed(1)}
             </span>
-            <span className="text-xl text-green-700">°C</span>
+            <span className="text-lg text-green-700">°C</span>
           </div>
         </div>
       </div>
