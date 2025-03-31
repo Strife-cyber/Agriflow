@@ -39,6 +39,7 @@
         "heroSubHeading": "Harnessing automation and IoT to unlock unprecedented efficiency, transforming agriculture like never before",
         "home": "Home",
         "language": "Language",
+        "legal": "Legal",
         "loading": "Loading...",
         "login": "Login",
         "logout": "Logout",
@@ -97,7 +98,11 @@
         "harvestPlanning": "Harvest Planning",
         "nutrientAnalysis": "Nutrient Analysis",
         "pestControl": "Pest Control",
-        "waterConservation": "Water Conservation"
+        "waterConservation": "Water Conservation",
+        "Privacy": "Privacy",
+        "Terms": "Terms",
+        "Copyright": "Copyright",
+        "License": "License"
 
     },
     "fr": {
@@ -140,6 +145,7 @@
         "heroSubHeading": "Exploiter l'automatisation et l'IoT pour une efficacité sans précédent, transformant l'agriculture comme jamais auparavant.",
         "home": "Accueil",
         "language": "Langue",
+        "legal": "Légal",
         "loading": "Chargement...",
         "login": "Connexion",
         "logout": "Déconnexion",
@@ -198,6 +204,11 @@
         "harvestPlanning": "Planification des Récoltes",
         "nutrientAnalysis": "Analyse des Nutriments",
         "pestControl": "Lutte contre les Ravageurs",
-        "waterConservation": "Conservation de l'Eau"
+        "waterConservation": "Conservation de l'Eau",
+        "Privacy": "Confidentialité",
+        "Terms": "Conditions",
+        "Copyright": "Droits d'auteur",
+        "License": "Licence"
+          
     }
 }

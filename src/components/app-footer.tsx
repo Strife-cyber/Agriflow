@@ -1,15 +1,22 @@
+import React from "react";
 import AppLogo from "./app-logo";
+import cn from "@/utils/class-merge";
 import { useAnimation, aos } from "@/context/aos";
+import { useTranslation } from "@/context/translation";
 
-const AppFooter = () => {
+const AppFooter: React.FC = (style: { style?: string }) => {
   useAnimation();
+  const translation = useTranslation();
 
   return (
-    <footer className="relative bg-gradient-to-br from-gray-900 to-emerald-900 py-24 overflow-hidden isolate">
+    <footer className={cn(
+      "relative py-24 overflow-hidden isolate bg-black/50 text-white",
+      style
+    )}>
       {/* Background Elements */}
       <div className="absolute inset-0 z-[-1] opacity-20">
-        <div className="absolute inset-0 bg-[radial-gradient(#059669_1px,transparent_1px)] [background-size:16px_16px]">
-          <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-gray-900" />
+        <div className="absolute inset-0 bg-[radial-gradient(#34d399_1px,transparent_1px)] [background-size:16px_16px]">
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-emerald-50" />
         </div>
       </div>
 
@@ -20,20 +27,20 @@ const AppFooter = () => {
             <div className="flex items-center gap-3">
               <AppLogo className="text-white"/>
             </div>
-            <p className="text-gray-300/90 text-lg leading-relaxed">
-              Revolutionizing agriculture with smart technology and IoT solutions.
+            <p className="text-white text-lg leading-relaxed">
+              { translation("heroHeading") }
             </p>
             <div className="flex gap-5">
               {['twitter', 'facebook', 'instagram'].map((platform, i) => (
                 <a 
                   key={platform}
                   href="#" 
-                  className="p-3 rounded-xl bg-gray-800/30 backdrop-blur-sm border border-emerald-400/20 hover:border-emerald-400/40 transition-all duration-300 hover:-translate-y-1"
+                  className="p-3 rounded-xl bg-white backdrop-blur-sm border border-gray-300 hover:border-emerald-400/40 transition-all duration-300 hover:-translate-y-1"
                   data-aos={aos.fadeRight}
                   data-aos-delay={i * 100}
                 >
                   <svg 
-                    className="h-6 w-6 text-emerald-400 hover:text-cyan-400 transition-colors"
+                    className="h-6 w-6 text-emerald-600 hover:text-cyan-600 transition-colors"
                     fill="currentColor" 
                     viewBox="0 0 24 24"
                   >
@@ -46,17 +53,17 @@ const AppFooter = () => {
 
           {/* Services Links */}
           <div data-aos={aos.fadeUp} data-aos-delay="150">
-            <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 mb-6">
-              Services
+            <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600 mb-6">
+              { translation("services") }
             </h3>
             <ul className="space-y-4">
-              {['IoT Solutions', 'Smart Farming', 'Data Analytics', 'Consulting'].map((item, _) => (
+              {[translation("iotSolutions"), translation("automatedFarming"), translation("dataAnalytics"), translation("cropSurveillance")].map((item, _) => (
                 <li key={item}>
                   <a 
                     href="#" 
-                    className="text-gray-300 hover:text-white flex items-center group transition-all duration-300"
+                    className="text-white hover:text-gray-900 flex items-center group transition-all duration-300"
                   >
-                    <span className="mr-2 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">▹</span>
+                    <span className="mr-2 text-white opacity-0 group-hover:opacity-100 transition-opacity">▹</span>
                     {item}
                   </a>
                 </li>
@@ -66,17 +73,17 @@ const AppFooter = () => {
 
           {/* Legal Links */}
           <div data-aos={aos.fadeUp} data-aos-delay="200">
-            <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400 mb-6">
-              Legal
+            <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600 mb-6">
+              { translation("legal") }
             </h3>
             <ul className="space-y-4">
-              {['Privacy', 'Terms', 'Copyright', 'License'].map((item, _) => (
+              {[translation('Privacy'), translation('Terms'), translation('Copyright'), translation('License')].map((item, _) => (
                 <li key={item}>
                   <a 
                     href="#" 
-                    className="text-gray-300 hover:text-white flex items-center group transition-all duration-300"
+                    className="text-white hover:text-gray-900 flex items-center group transition-all duration-300"
                   >
-                    <span className="mr-2 text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">▹</span>
+                    <span className="mr-2 text-white opacity-0 group-hover:opacity-100 transition-opacity">▹</span>
                     {item}
                   </a>
                 </li>
@@ -87,13 +94,13 @@ const AppFooter = () => {
 
         {/* Copyright Section */}
         <div 
-          className="mt-16 pt-8 border-t border-emerald-400/20 text-center"
+          className="mt-16 pt-8 border-t border-gray-300 text-center"
           data-aos={aos.fadeUp}
           data-aos-delay="300"
         >
-          <p className="text-gray-400/90">
+          <p className="text-gray-500">
             © {new Date().getFullYear()} AgriTech. All rights reserved. |{" "}
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-cyan-400">
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600">
               A School Project
             </span>
           </p>

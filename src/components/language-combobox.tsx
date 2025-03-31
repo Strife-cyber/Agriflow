@@ -40,7 +40,7 @@ const LanguageCombobox = () => {
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="md:w-[140px] justify-between border border-emerald-400/50 hover:border-emerald-500 bg-white text-gray-700 rounded-xl px-4 py-5 transition-all duration-300 hover:scale-105"
+            className="md:w-[140px] justify-between border border-emerald-400/50 hover:border-emerald-500 bg-white text-gray-700 px-4 py-5 transition-all duration-300 hover:scale-105"
           >
             <Globe className="mr-2 h-5 w-5 text-emerald-500" />
             <div className="hidden md:block font-medium">

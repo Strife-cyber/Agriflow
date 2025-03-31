@@ -13,11 +13,11 @@ const LandingStats = () => {
     useAnimation(); // Use centralized AOS initialization
 
     return (
-        <section className="relative py-24 bg-gray-900 overflow-hidden isolate">
+        <section className="relative py-24 bg-gradient-to-br from-emerald-100 to-emerald-200 overflow-hidden isolate">
             {/* Dynamic Grid Background */}
-            <div className="absolute inset-0 z-[-1] opacity-20">
+            <div className="absolute inset-0 z-[-1] opacity-40">
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYiIGhlaWdodD0iMTYiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0iIzA5NjQ0OSIvPjwvc3ZnPg==')]">
-                    <div className="absolute inset-0 bg-gradient-to-b from-gray-900 via-transparent to-gray-900" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white" />
                 </div>
             </div>
 
@@ -44,7 +44,7 @@ const LandingStats = () => {
                             key={index}
                             data-aos={aos.slideUp}
                             data-aos-delay={index * 150}
-                            className="group relative p-8 rounded-3xl bg-gray-800/30 backdrop-blur-lg border border-green-400/20 hover:border-green-400/40 transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-green-500/10"
+                            className="group relative p-8 rounded-3xl bg-white/50 backdrop-blur-lg border border-green-400/20 hover:border-green-400/40 transition-all duration-500 hover:-translate-y-2 shadow-xl hover:shadow-green-500/10"
                         >
                             {/* Hover Shine Effect */}
                             <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-green-400/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -56,7 +56,7 @@ const LandingStats = () => {
                                 <p className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-400">
                                     {stat.value}
                                 </p>
-                                <p className="text-lg text-gray-300 font-medium">
+                                <p className="text-lg text-gray-800 font-medium">
                                     {isEnglish ? stat.en : stat.fr}
                                 </p>
                             </div>
@@ -73,7 +73,7 @@ const LandingStats = () => {
                 {[...Array(30)].map((_, i) => (
                     <div
                         key={i}
-                        className="absolute w-0.5 h-0.5 bg-green-400/30 rounded-full animate-float"
+                        className="absolute w-0.5 h-0.5 bg-green-400/40 rounded-full animate-float"
                         style={{
                             left: `${Math.random() * 100}%`,
                             top: `${Math.random() * 100}%`,
