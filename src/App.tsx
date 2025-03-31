@@ -1,6 +1,7 @@
 import Limits from './pages/dashboard/limit';
 import Profile from './pages/settings/profile';
 import LoginPage from './pages/auth/login-page';
+import History from './pages/dashboard/history';
 import Password from './pages/settings/password';
 import Dashboard from './pages/dashboard/dashboard';
 import { AuthProvider } from './context/auth-context';
@@ -20,6 +21,7 @@ function App() {
             <Route path='/' element={<LandingPage/>}/>
             <Route path='/limit' element={<Limits/>}/>
             <Route path='/auth' element={<LoginPage/>}/>
+            <Route path='/history' element={<History/>}/>
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/settings/password' element={<Password/>}/>
             <Route path='/reset-password' element={<ResetPassword/>}/>
