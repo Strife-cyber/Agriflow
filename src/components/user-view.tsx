@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/context/language-context";
+import { realtimeCollection } from "@/hooks/firestore-hook"; // Ensure this hook returns QuerySnapshot
 
 // Types
 interface User {
@@ -16,49 +17,43 @@ interface User {
   role: string;
 }
 
-// Mock data generator
-const generateMockUsers = (count: number): User[] => {
-  const roles = ["Administrator", "Manager", "Field Worker", "Agronomist", "Viewer"];
-  return Array.from({ length: count }).map((_, i) => ({
-    id: `user-${i + 1}`,
-    name: `User ${i + 1}`,
-    email: `user${i + 1}@example.com`,
-    role: roles[Math.floor(Math.random() * roles.length)],
-  }));
-};
-
 export function SimplifiedUserView() {
   const { isEnglish } = useLanguage();
+  const { data: querySnapshot, isLoading: isLoading } = realtimeCollection("users"); // Fetching QuerySnapshot
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [isLoading, setIsLoading] = useState(true);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
-  // Load mock data
+  // Map QuerySnapshot to users
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated API call
-      const mockUsers = generateMockUsers(25);
-      setUsers(mockUsers);
-      setFilteredUsers(mockUsers);
-      setIsLoading(false);
-    };
-    loadData();
-  }, []);
+    if (querySnapshot) {
+      const usersData = querySnapshot.docs.map((doc) => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          name: data.username,
+          email: data.email,
+          role: data.role,
+        };
+      });
+      setUsers(usersData);
+    }
+  }, [querySnapshot]);
 
-  // Apply filters and search
+  // Apply filters and search whenever users, searchQuery, or roleFilter changes
   useEffect(() => {
     let result = [...users];
 
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      result = result.filter((user) => user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query));
+      result = result.filter(
+        (user) => user.name.toLowerCase().includes(query) || user.email.toLowerCase().includes(query)
+      );
     }
 
     if (roleFilter !== "all") {
@@ -98,7 +93,12 @@ export function SimplifiedUserView() {
           </SelectContent>
         </Select>
 
-        <Button variant="outline" onClick={() => setIsLoading(true)} disabled={isLoading} className="border-gray-300">
+        <Button
+          variant="outline"
+          onClick={() => console.log("Refetch triggered (handled automatically by Firestore real-time listener)")}
+          disabled={isLoading}
+          className="border-gray-300"
+        >
           <RefreshCcw className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
           {isEnglish ? "Refresh" : "Rafraîchir"}
         </Button>
@@ -136,7 +136,9 @@ export function SimplifiedUserView() {
                   <TableRow key={user.id} className="hover:bg-gray-100">
                     <TableCell>{user.name}</TableCell>
                     <TableCell>{user.email}</TableCell>
-                    <TableCell><Badge className="bg-gray-100 text-gray-800">{user.role}</Badge></TableCell>
+                    <TableCell>
+                      <Badge className="bg-gray-100 text-gray-800">{user.role}</Badge>
+                    </TableCell>
                   </TableRow>
                 ))
               )}
@@ -159,11 +161,19 @@ export function SimplifiedUserView() {
         </Select>
 
         <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))} disabled={currentPage === 1}>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+          >
             <ChevronLeft className="w-4 h-4" />
           </Button>
           <span>{`${currentPage} / ${totalPages}`}</span>
-          <Button variant="outline" onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))} disabled={currentPage === totalPages}>
+          <Button
+            variant="outline"
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+          >
             <ChevronRight className="w-4 h-4" />
           </Button>
         </div>

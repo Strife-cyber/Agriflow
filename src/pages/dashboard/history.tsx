@@ -2,7 +2,6 @@ import { format } from "date-fns";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { generateMockEvents } from "@/utils/mock-events";
 import { EventCard } from "@/components/history/event-card";
 import { EventTimeline } from "@/components/history/event-timeline";
 import { HistoryFilters } from "@/components/history/history-filters";
@@ -12,9 +11,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowDown, ArrowUp, Download, FileText, List, Loader2, RefreshCcw, TimerIcon as Timeline } from "lucide-react";
 import AppLayout from "@/layouts/app-layout";
 import { useTranslation } from "@/context/translation";
+import { useRealtimeHook } from "@/hooks/realtime-hook";
 
 export default function History() {
     const translation = useTranslation();
+    const { data } = useRealtimeHook("history");
     const [view, setView] = useState<"list" | "timeline">("list")
     const [sortField, setSortField] = useState<"timestamp" | "severity">("timestamp")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
@@ -44,18 +45,13 @@ export default function History() {
 
     // Load mock data
     useEffect(() => {
-        const loadData = async () => {
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-        const mockEvents = generateMockEvents()
-        setEvents(mockEvents)
-        setFilteredEvents(mockEvents)
-        setIsLoading(false)
+        if (data) {
+            const eventsArray: Event[] = Object.values(data);
+            setEvents(eventsArray);
+            setFilteredEvents(eventsArray);
+            setIsLoading(false)
         }
-
-        loadData()
-    }, [])
+    }, [data])
 
     // Apply filters
     useEffect(() => {
@@ -125,9 +121,12 @@ export default function History() {
         // Apply sorting
         result.sort((a, b) => {
         if (sortField === "timestamp") {
+            const dateA = new Date(a.timestamp);
+            const dateB = new Date(b.timestamp);
+
             return sortDirection === "asc"
-            ? a.timestamp.getTime() - b.timestamp.getTime()
-            : b.timestamp.getTime() - a.timestamp.getTime()
+            ? dateA.getTime() - dateB.getTime()
+            : dateB.getTime() - dateA.getTime()
         } else if (sortField === "severity") {
             const severityOrder = { error: 3, warning: 2, info: 1, success: 0 }
             const severityA = severityOrder[a.severity]
@@ -256,9 +255,9 @@ export default function History() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto p-4 lg:p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">{ translation("event_title") }</h1>
+                    <h1 className="text-2xl font-bold text-gray-800 mb-4 md:mb-0">{ translation("event_title") }</h1>
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap items-center justify-center gap-2" >
                     <Button
                         variant="outline"
                         onClick={handleRefresh}
@@ -278,7 +277,7 @@ export default function History() {
                         { translation("exportCsv") }
                     </Button>
 
-                    <div className="flex rounded-md overflow-hidden border border-gray-200">
+                    <div className="flex items-center rounded-md overflow-hidden border border-gray-200 self-center">
                         <Button
                         variant="ghost"
                         size="sm"
