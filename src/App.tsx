@@ -11,6 +11,8 @@ import ResetPassword from './pages/auth/reset-password';
 import ForgotPassword from './pages/auth/forgot-password';
 import { LanguageProvider } from './context/language-context';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import IoTAgriculturePage from './pages/dashboard/iot-agriculture-page';
+import SensorDataAnalysis from './pages/dashboard/sensor-data-analysis';
 
 function App() {
 
@@ -27,7 +29,9 @@ function App() {
             <Route path='/dashboard' element={<Dashboard/>}/>
             <Route path='/settings/password' element={<Password/>}/>
             <Route path='/reset-password' element={<ResetPassword/>}/>
+            <Route path='/analytics' element={<SensorDataAnalysis/>}/>
             <Route path='/forgot-password' element={<ForgotPassword/>}/>
+            <Route path='/agriculture' element={<IoTAgriculturePage/>}/>
             <Route path='/profile/edit' element={<Profile mustVerifyEmail={false}/>}/>
             <Route path='/settings/profile' element={<Profile mustVerifyEmail={false}/>}/>
           </Routes>
