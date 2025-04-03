@@ -5,6 +5,7 @@ import { ThresholdSlider } from "./threshold-slider"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
+import { useTranslation } from "@/context/translation"
 
 interface CO2ThresholdsProps {
   defaultLowThreshold?: number
@@ -19,6 +20,7 @@ export function CO2Thresholds({
   onThresholdChange,
   className,
 }: CO2ThresholdsProps) {
+  const t = useTranslation()
   const [enableAlerts, setEnableAlerts] = useState(true)
   const [enableVentilation, setEnableVentilation] = useState(true)
 
@@ -36,11 +38,11 @@ export function CO2Thresholds({
             <div className="p-1.5 rounded-md bg-green-100 text-green-600">
               <Wind className="h-4 w-4" />
             </div>
-            <span>CO₂ Level Thresholds</span>
+            <span>{t("co2_level_thresholds")}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Label htmlFor="co2-alerts" className="text-sm text-gray-500">
-              Alerts
+              {t("alerts")}
             </Label>
             <Switch
               id="co2-alerts"
@@ -53,7 +55,7 @@ export function CO2Thresholds({
       </CardHeader>
       <CardContent className="p-4">
         <ThresholdSlider
-          label="CO₂ Level Range"
+          label={t("co2_level_range")}
           minValue={300}
           maxValue={2500}
           step={50}
@@ -73,22 +75,21 @@ export function CO2Thresholds({
               className="data-[state=checked]:bg-green-600"
             />
             <Label htmlFor="auto-ventilation" className="text-sm text-gray-700">
-              Automatic ventilation control
+              {t("automatic_ventilation_control")}
             </Label>
           </div>
-          {enableVentilation && <Badge className="bg-green-100 text-green-700">Active</Badge>}
+          {enableVentilation && <Badge className="bg-green-100 text-green-700">{t("active")}</Badge>}
         </div>
 
         <div className="mt-4 text-sm text-gray-600">
-          <p>Set CO₂ level thresholds for optimal plant growth and safe working conditions.</p>
+          <p>{t("set_co2_thresholds")}</p>
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Below {defaultLowThreshold} ppm: Suboptimal for plant growth</li>
-            <li>Above {defaultHighThreshold} ppm: Potentially harmful levels</li>
-            <li>Above 2000 ppm: Dangerous for human exposure</li>
+            <li>{t("suboptimal_plant_growth", { value: defaultLowThreshold })}</li>
+            <li>{t("potentially_harmful_levels", { value: defaultHighThreshold })}</li>
+            <li>{t("dangerous_human_exposure")}</li>
           </ul>
         </div>
       </CardContent>
     </Card>
   )
 }
-

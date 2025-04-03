@@ -9,6 +9,7 @@ import { DatePickerWithRange } from "./date-range-picker";
 import type { EventCategory, EventSeverity } from "@/index";
 import { AlertTriangle, CheckCircle2, ChevronDown, Filter, Info, Search, XCircle } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { useTranslation } from "@/context/translation";
 
 export interface HistoryFilters {
   search: string
@@ -38,6 +39,7 @@ export function HistoryFilters({
   availableUsers,
   onReset,
 }: HistoryFiltersProps) {
+  const translation = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false)
 
   const updateFilters = (partialFilters: Partial<HistoryFilters>) => {
@@ -152,7 +154,7 @@ export function HistoryFilters({
         <div className="flex items-center justify-between">
           <h3 className="font-medium text-gray-800 flex items-center gap-2">
             <Filter className="h-4 w-4" />
-            Filters
+            { translation("filter") }
             {activeFiltersCount > 0 && <Badge className="bg-green-100 text-green-800 ml-2">{activeFiltersCount}</Badge>}
           </h3>
           <Button variant="ghost" size="sm" onClick={() => setIsExpanded(!isExpanded)} className="text-gray-500">
@@ -179,7 +181,7 @@ export function HistoryFilters({
             onClick={onReset}
             className="border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
           >
-            Reset
+            { translation("reset") }
           </Button>
         </div>
       </div>
@@ -189,7 +191,7 @@ export function HistoryFilters({
           <Accordion type="multiple" className="w-full">
             <AccordionItem value="categories">
               <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
-                Event Categories
+                { translation("eventCategories") }
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pt-2">
@@ -202,7 +204,7 @@ export function HistoryFilters({
                     }`}
                     onClick={() => toggleCategory("sensor")}
                   >
-                    Sensor
+                    { translation("sensor") }
                   </Badge>
                   <Badge
                     variant="outline"
@@ -213,7 +215,7 @@ export function HistoryFilters({
                     }`}
                     onClick={() => toggleCategory("alert")}
                   >
-                    Alert
+                    { translation("alerts") }
                   </Badge>
                   <Badge
                     variant="outline"
@@ -235,7 +237,7 @@ export function HistoryFilters({
                     }`}
                     onClick={() => toggleCategory("harvest")}
                   >
-                    Harvest
+                    { translation("harvest") }
                   </Badge>
                   <Badge
                     variant="outline"
@@ -246,7 +248,7 @@ export function HistoryFilters({
                     }`}
                     onClick={() => toggleCategory("planting")}
                   >
-                    Planting
+                    { translation("planting") }
                   </Badge>
                   <Badge
                     variant="outline"
@@ -257,7 +259,7 @@ export function HistoryFilters({
                     }`}
                     onClick={() => toggleCategory("system")}
                   >
-                    System
+                    { translation("system") }
                   </Badge>
                 </div>
               </AccordionContent>
@@ -265,7 +267,7 @@ export function HistoryFilters({
 
             <AccordionItem value="severities">
               <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
-                Severity Levels
+                { translation("severityLevel") }
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-2">
@@ -292,7 +294,7 @@ export function HistoryFilters({
 
             <AccordionItem value="locations">
               <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
-                Locations
+                { translation("locations") }
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pt-2">
@@ -316,7 +318,7 @@ export function HistoryFilters({
 
             <AccordionItem value="sensors">
               <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
-                Sensors
+                { `${translation("sensor")}s` }
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pt-2">
@@ -340,7 +342,7 @@ export function HistoryFilters({
 
             <AccordionItem value="users">
               <AccordionTrigger className="text-sm font-medium text-gray-700 hover:no-underline">
-                Users
+                { `${translation("user")}s` }
               </AccordionTrigger>
               <AccordionContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 pt-2">
@@ -371,7 +373,7 @@ export function HistoryFilters({
               className="data-[state=checked]:bg-green-600"
             />
             <Label htmlFor="only-unresolved" className="text-sm text-gray-700">
-              Show only unresolved events
+              { translation("showOnlyUnresolvedEvents") }
             </Label>
           </div>
         </div>

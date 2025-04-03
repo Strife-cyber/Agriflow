@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { AlertTriangle, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useTranslation } from "@/context/translation"
 
 interface ThresholdSliderProps {
   label: string
@@ -36,6 +37,7 @@ export function ThresholdSlider({
   colorScheme = "temperature",
   decimals = 0,
 }: ThresholdSliderProps) {
+  const translation = useTranslation();
   const [lowThreshold, setLowThreshold] = useState(defaultLowThreshold)
   const [highThreshold, setHighThreshold] = useState(defaultHighThreshold)
   const [lowInput, setLowInput] = useState(defaultLowThreshold.toFixed(decimals))
@@ -64,13 +66,13 @@ export function ThresholdSlider({
   // Validate thresholds
   const validateThresholds = (low: number, high: number) => {
     if (low < minValue) {
-      return `Low threshold cannot be less than ${minValue}${unit}`
+      return translation("low_threshold_error", { minValue, unit })
     }
     if (high > maxValue) {
-      return `High threshold cannot be greater than ${maxValue}${unit}`
+      return translation("high_threshold_error", { maxValue, unit });
     }
     if (low >= high) {
-      return "Low threshold must be less than high threshold"
+      return translation("threshold_order_error");
     }
     return null
   }
@@ -137,7 +139,7 @@ export function ThresholdSlider({
         <h3 className="text-lg font-medium text-gray-800">{label}</h3>
         {isDirty && (
           <Badge variant="outline" className="bg-amber-50 text-amber-600 border-amber-200">
-            Unsaved Changes
+            { translation("unsaved_changes") }
           </Badge>
         )}
       </div>
@@ -177,7 +179,7 @@ export function ThresholdSlider({
       {/* Input fields */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1">
-          <label className="text-xs text-gray-500">Low Threshold</label>
+          <label className="text-xs text-gray-500">{ translation("low_threshold") }</label>
           <div className="relative">
             <Input
               type="text"
@@ -189,7 +191,7 @@ export function ThresholdSlider({
           </div>
         </div>
         <div className="space-y-1">
-          <label className="text-xs text-gray-500">High Threshold</label>
+          <label className="text-xs text-gray-500">{ translation("high_threshold") }</label>
           <div className="relative">
             <Input
               type="text"
@@ -222,7 +224,7 @@ export function ThresholdSlider({
           onClick={resetToDefaults}
           className="border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-100"
         >
-          Reset
+          { translation("reset") }
         </Button>
         <Button
           size="sm"
@@ -231,11 +233,11 @@ export function ThresholdSlider({
           className="bg-green-600 hover:bg-green-700 text-white"
         >
           {isDirty ? (
-            "Apply Changes"
+            `${translation("apply_changes")}`
           ) : (
             <div className="flex items-center gap-1">
               <Check className="h-4 w-4" />
-              <span>Saved</span>
+              <span>{ translation("saved") }</span>
             </div>
           )}
         </Button>

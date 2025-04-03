@@ -3,6 +3,7 @@ import AppLayout from "@/layouts/app-layout";
 import { useTranslation } from "@/context/translation";
 import { useLanguage } from "@/context/language-context";
 import { ThresholdSettings } from "@/components/threshold-settings";
+import { ActuatorControlPanel } from "@/components/actuator-panel";
 
 export default function Limits() {
     const { isEnglish } = useLanguage();
@@ -25,6 +26,14 @@ export default function Limits() {
                         </h1>
                         <ThresholdSettings />
                     </div>
+                </div>
+                <div className="container mx-auto p-4 lg:p-6">
+                    <div className="mb-6">
+                        <h1 className="text-3xl font-bold text-gray-800">System Controls</h1>
+                        <p className="text-gray-600 mt-2">Manage your agricultural system's actuators</p>
+                    </div>
+
+                    <ActuatorControlPanel />
                 </div>
             </div>
         </AppLayout>

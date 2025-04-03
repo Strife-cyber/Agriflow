@@ -5,6 +5,7 @@ import { ThresholdSlider } from "./threshold-slider"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useTranslation } from "@/context/translation"
 
 interface LuminosityThresholdsProps {
   defaultLowThreshold?: number
@@ -23,6 +24,7 @@ export function LuminosityThresholds({
   onThresholdChange,
   className,
 }: LuminosityThresholdsProps) {
+  const t = useTranslation()
   const [enableAlerts, setEnableAlerts] = useState(true)
   const [_, setUnit] = useState<"%" | "lux">("%")
 
@@ -46,11 +48,11 @@ export function LuminosityThresholds({
             <div className="p-1.5 rounded-md bg-green-100 text-green-600">
               <Sun className="h-4 w-4" />
             </div>
-            <span>Luminosity Thresholds</span>
+            <span>{t("luminosity_thresholds")}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Label htmlFor="light-alerts" className="text-sm text-gray-500">
-              Alerts
+              {t("alerts")}
             </Label>
             <Switch
               id="light-alerts"
@@ -68,15 +70,15 @@ export function LuminosityThresholds({
               value="percent"
               className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800"
             >
-              Percentage
+              {t("percentage")}
             </TabsTrigger>
             <TabsTrigger value="lux" className="data-[state=active]:bg-green-100 data-[state=active]:text-green-800">
-              Lux
+              {t("lux")}
             </TabsTrigger>
           </TabsList>
           <TabsContent value="percent" className="mt-4">
             <ThresholdSlider
-              label="Light Intensity Range (%)"
+              label={t("light_intensity_range_percent")}
               minValue={0}
               maxValue={100}
               step={1}
@@ -89,7 +91,7 @@ export function LuminosityThresholds({
           </TabsContent>
           <TabsContent value="lux" className="mt-4">
             <ThresholdSlider
-              label="Light Intensity Range (lux)"
+              label={t("light_intensity_range_lux")}
               minValue={0}
               maxValue={100000}
               step={1000}
@@ -103,17 +105,13 @@ export function LuminosityThresholds({
         </Tabs>
 
         <div className="mt-4 text-sm text-gray-600">
-          <p>
-            Set light intensity thresholds based on crop requirements. Alerts will trigger when light levels fall
-            outside this range.
-          </p>
+          <p>{t("set_light_intensity_thresholds")}</p>
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Below threshold: Insufficient light for optimal photosynthesis</li>
-            <li>Above threshold: Potential light stress or excessive heat</li>
+            <li>{t("insufficient_light_warning")}</li>
+            <li>{t("excessive_light_warning")}</li>
           </ul>
         </div>
       </CardContent>
     </Card>
   )
 }
-

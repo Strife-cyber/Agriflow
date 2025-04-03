@@ -11,8 +11,10 @@ import type { BreadcrumbItem, Event, EventCategory, EventSeverity } from "@/inde
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ArrowDown, ArrowUp, Download, FileText, List, Loader2, RefreshCcw, TimerIcon as Timeline } from "lucide-react";
 import AppLayout from "@/layouts/app-layout";
+import { useTranslation } from "@/context/translation";
 
 export default function History() {
+    const translation = useTranslation();
     const [view, setView] = useState<"list" | "timeline">("list")
     const [sortField, setSortField] = useState<"timestamp" | "severity">("timestamp")
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc")
@@ -254,7 +256,7 @@ export default function History() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <div className="container mx-auto p-4 lg:p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Event History</h1>
+                    <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">{ translation("event_title") }</h1>
 
                     <div className="flex flex-wrap gap-3">
                     <Button
@@ -264,7 +266,7 @@ export default function History() {
                         className="border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                     >
                         {isLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCcw className="h-4 w-4 mr-2" />}
-                        Refresh
+                        { translation("refresh") }
                     </Button>
 
                     <Button
@@ -273,7 +275,7 @@ export default function History() {
                         className="border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                     >
                         <Download className="h-4 w-4 mr-2" />
-                        Export CSV
+                        { translation("exportCsv") }
                     </Button>
 
                     <div className="flex rounded-md overflow-hidden border border-gray-200">
@@ -288,7 +290,7 @@ export default function History() {
                         }`}
                         >
                         <List className="h-4 w-4 mr-2" />
-                        List
+                        { translation("listView") }
                         </Button>
                         <Button
                         variant="ghost"
@@ -301,7 +303,7 @@ export default function History() {
                         }`}
                         >
                         <Timeline className="h-4 w-4 mr-2" />
-                        Timeline
+                        { translation("timelineView") }
                         </Button>
                     </div>
                     </div>
@@ -326,16 +328,16 @@ export default function History() {
                     <Card>
                     <CardContent className="flex flex-col items-center justify-center py-12">
                         <FileText className="h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-xl font-medium text-gray-700 mb-2">No events found</h3>
+                        <h3 className="text-xl font-medium text-gray-700 mb-2">{ translation("noEventsFound") }</h3>
                         <p className="text-gray-500 text-center max-w-md">
-                        No events match your current filters. Try adjusting your filters or search criteria.
+                            { translation("filter") }
                         </p>
                         <Button
                         variant="outline"
                         onClick={resetFilters}
                         className="mt-4 border-gray-200 text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                         >
-                        Reset Filters
+                         { translation("resetFilters") }
                         </Button>
                     </CardContent>
                     </Card>
@@ -345,18 +347,18 @@ export default function History() {
                         <div className="space-y-4">
                         <div className="flex justify-between items-center mb-2">
                             <div className="text-sm text-gray-500">
-                            Showing {paginatedEvents.length} of {filteredEvents.length} events
+                            { translation("showingEvents", { "count": paginatedEvents.length, "total": filteredEvents.length }) }
                             </div>
 
                             <div className="flex items-center gap-2">
-                            <span className="text-sm text-gray-500">Sort by:</span>
+                            <span className="text-sm text-gray-500">{ translation("sortBy") }</span>
                             <Button
                                 variant="ghost"
                                 size="sm"
                                 onClick={() => handleSortChange("timestamp")}
                                 className="text-gray-600 hover:text-gray-800"
                             >
-                                Date
+                                { translation("date") }
                                 {sortField === "timestamp" &&
                                 (sortDirection === "asc" ? (
                                     <ArrowUp className="h-3 w-3 ml-1" />
@@ -370,7 +372,7 @@ export default function History() {
                                 onClick={() => handleSortChange("severity")}
                                 className="text-gray-600 hover:text-gray-800"
                             >
-                                Severity
+                                { translation("severity") }
                                 {sortField === "severity" &&
                                 (sortDirection === "asc" ? (
                                     <ArrowUp className="h-3 w-3 ml-1" />
@@ -391,7 +393,7 @@ export default function History() {
                         {totalPages > 1 && (
                             <div className="flex justify-between items-center mt-6">
                             <div className="flex items-center gap-2">
-                                <span className="text-sm text-gray-500">Rows per page:</span>
+                                <span className="text-sm text-gray-500">{ translation("rowsPerPage") }</span>
                                 <Select value={pageSize.toString()} onValueChange={(value) => setPageSize(Number(value))}>
                                 <SelectTrigger className="w-16 h-8 text-xs border-gray-200">
                                     <SelectValue />
@@ -413,7 +415,7 @@ export default function History() {
                                 disabled={page === 1}
                                 className="h-8 w-8 p-0 border-gray-200"
                                 >
-                                <span className="sr-only">Previous page</span>
+                                <span className="sr-only">{ translation("previous") }</span>
                                 <ArrowUp className="h-4 w-4 rotate-90" />
                                 </Button>
 
@@ -428,7 +430,7 @@ export default function History() {
                                 disabled={page === totalPages}
                                 className="h-8 w-8 p-0 border-gray-200"
                                 >
-                                <span className="sr-only">Next page</span>
+                                <span className="sr-only">{ translation("next") }</span>
                                 <ArrowUp className="h-4 w-4 -rotate-90" />
                                 </Button>
                             </div>

@@ -1,32 +1,32 @@
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Droplets } from "lucide-react"
-import { ThresholdSlider } from "./threshold-slider"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Droplets } from "lucide-react";
+import { ThresholdSlider } from "./threshold-slider";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useTranslation } from "@/context/translation";
 
 interface SoilHumidityThresholdsProps {
-  defaultLowThreshold?: number
-  defaultHighThreshold?: number
-  onThresholdChange?: (low: number, high: number) => void
-  className?: string
+  defaultLowThreshold?: number;
+  defaultHighThreshold?: number;
+  onThresholdChange?: (low: number, high: number) => void;
+  className?: string;
 }
 
 export function SoilHumidityThresholds({
-  //defaultLowThreshold = 30,
-  //defaultHighThreshold = 70,
   onThresholdChange,
   className,
 }: SoilHumidityThresholdsProps) {
-  const [enableAlerts, setEnableAlerts] = useState(true)
-  const [cropType, setCropType] = useState("general")
+  const t = useTranslation();
+  const [enableAlerts, setEnableAlerts] = useState(true);
+  const [cropType, setCropType] = useState("general");
 
   const handleThresholdChange = (low: number, high: number) => {
     if (enableAlerts) {
-      onThresholdChange?.(low, high)
+      onThresholdChange?.(low, high);
     }
-  }
+  };
 
   // Preset thresholds for different crop types
   const cropPresets = {
@@ -35,15 +35,18 @@ export function SoilHumidityThresholds({
     wheat: { low: 35, high: 65 },
     rice: { low: 60, high: 90 },
     vegetables: { low: 50, high: 75 },
-  }
+  };
 
   const handleCropChange = (value: string) => {
-    setCropType(value)
-    const preset = cropPresets[value as keyof typeof cropPresets]
+    setCropType(value);
+    const preset = cropPresets[value as keyof typeof cropPresets];
     if (preset && enableAlerts) {
-      onThresholdChange?.(preset.low, preset.high)
+      onThresholdChange?.(preset.low, preset.high);
     }
-  }
+  };
+
+  const valueLow = cropPresets[cropType as keyof typeof cropPresets].low;
+  const valueHigh = cropPresets[cropType as keyof typeof cropPresets].high;
 
   return (
     <Card className={`bg-white border-green-100 ${className}`}>
@@ -53,11 +56,11 @@ export function SoilHumidityThresholds({
             <div className="p-1.5 rounded-md bg-green-100 text-green-600">
               <Droplets className="h-4 w-4" />
             </div>
-            <span>Soil Humidity Thresholds</span>
+            <span>{t("soil_humidity_thresholds")}</span>
           </div>
           <div className="flex items-center space-x-2">
             <Label htmlFor="humidity-alerts" className="text-sm text-gray-500">
-              Alerts
+              {t("alerts")}
             </Label>
             <Switch
               id="humidity-alerts"
@@ -71,24 +74,24 @@ export function SoilHumidityThresholds({
       <CardContent className="p-4">
         <div className="mb-4">
           <Label htmlFor="crop-type" className="text-sm text-gray-500 mb-1 block">
-            Crop Type
+            {t("crop_type")}
           </Label>
           <Select value={cropType} onValueChange={handleCropChange}>
             <SelectTrigger id="crop-type" className="bg-gray-50 border-gray-200 text-gray-800">
-              <SelectValue placeholder="Select crop type" />
+              <SelectValue placeholder={t("crop_type")} />
             </SelectTrigger>
             <SelectContent className="bg-white border-gray-200 text-gray-800">
-              <SelectItem value="general">General</SelectItem>
-              <SelectItem value="corn">Corn</SelectItem>
-              <SelectItem value="wheat">Wheat</SelectItem>
-              <SelectItem value="rice">Rice</SelectItem>
-              <SelectItem value="vegetables">Vegetables</SelectItem>
+              <SelectItem value="general">{t("general")}</SelectItem>
+              <SelectItem value="corn">{t("corn")}</SelectItem>
+              <SelectItem value="wheat">{t("wheat")}</SelectItem>
+              <SelectItem value="rice">{t("rice")}</SelectItem>
+              <SelectItem value="vegetables">{t("vegetables")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <ThresholdSlider
-          label="Soil Humidity Range"
+          label={t("soil_humidity_range")}
           minValue={0}
           maxValue={100}
           step={1}
@@ -100,17 +103,17 @@ export function SoilHumidityThresholds({
         />
 
         <div className="mt-4 text-sm text-gray-600">
-          <p>
-            Set soil humidity thresholds based on crop requirements. Alerts will trigger when soil moisture falls
-            outside this range.
-          </p>
+          <p>{t("set_soil_humidity")}</p>
           <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>Below {cropPresets[cropType as keyof typeof cropPresets].low}%: Risk of drought stress</li>
-            <li>Above {cropPresets[cropType as keyof typeof cropPresets].high}%: Risk of root rot</li>
+            <li>
+              {t("risk_drought", { "value": valueLow })}
+            </li>
+            <li>
+              {t("risk_root_rot", { "value": valueHigh })}
+            </li>
           </ul>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
-
