@@ -22,6 +22,7 @@ import {
   BarChart3,
 } from "lucide-react"
 import { useTranslation } from "@/context/translation";
+import { useFanHook, useFanStateHook, useLightHook, useLightStateHook, usePumpHook, usePumpStateHook } from "@/hooks/command-hooks";
 
 interface ActuatorState {
   isOn: boolean
@@ -39,34 +40,68 @@ interface ActuatorControlPanelProps {
 
 export function ActuatorControlPanel({ className, onStateChange }: ActuatorControlPanelProps) {
   const translation = useTranslation();
+  const { status: fanStatus, updateStatus: updateFanStatus } = useFanHook();
+  const { status: pumpStatus, updateStatus: updatePumpStatus } = usePumpHook();
+  const { status: lightStatus, updateStatus: updateLightStatus } = useLightHook();
+  const { status: fanStateStatus, updateStatus: updateFanStateStatus } = useFanStateHook();
+  const { status: pumpStateStatus, updateStatus: updatePumpStateStatus } = usePumpStateHook();
+  const { status: lightStateStatus, updateStatus: updateLightStateStatus } = useLightStateHook();
+  
 
   // State for each actuator
   const [lightState, setLightState] = useState<ActuatorState>({
-    isOn: false,
+    isOn: lightStatus?.data ?? false,
     intensity: 80,
     lastActivated: null,
     runTime: 0,
-    isAutomatic: true,
+    isAutomatic: lightStateStatus.data,
     isScheduled: false,
   })
 
   const [fanState, setFanState] = useState<ActuatorState>({
-    isOn: false,
+    isOn: fanStatus?.data ?? false,
     intensity: 60,
     lastActivated: null,
     runTime: 0,
-    isAutomatic: true,
+    isAutomatic: fanStateStatus.data,
     isScheduled: false,
   })
 
   const [pumpState, setPumpState] = useState<ActuatorState>({
-    isOn: false,
+    isOn: pumpStatus?.data ?? false,
     intensity: 70,
     lastActivated: null,
     runTime: 0,
-    isAutomatic: true,
+    isAutomatic: pumpStateStatus.data,
     isScheduled: false,
   })
+
+  useEffect(() => {
+    if (!fanStatus.isLoading && fanStatus.data !== undefined) {
+      setFanState((prev) => ({ ...prev, isOn: fanStatus.data }));
+    }
+    if (!fanStateStatus.isLoading && fanStateStatus.data !== undefined) {
+      setFanState((prev) => ({ ...prev, isAutomatic: fanStateStatus.data }));
+    }
+  }, [fanStatus.data, fanStateStatus.data]);
+  
+  useEffect(() => {
+    if (!pumpStatus.isLoading && pumpStatus.data !== undefined) {
+      setPumpState((prev) => ({ ...prev, isOn: pumpStatus.data }));
+    }
+    if (!pumpStateStatus.isLoading && pumpStateStatus.data !== undefined) {
+      setPumpState((prev) => ({ ...prev, isAutomatic: pumpStateStatus.data }));
+    }
+  }, [pumpStatus.data, pumpStateStatus.data]);
+  
+  useEffect(() => {
+    if (!lightStatus.isLoading && lightStatus.data !== undefined) {
+      setLightState((prev) => ({ ...prev, isOn: lightStatus.data }));
+    }
+    if (!lightStateStatus.isLoading && lightStateStatus.data !== undefined) {
+      setLightState((prev) => ({ ...prev, isAutomatic: lightStateStatus.data }));
+    }
+  }, [lightStatus.data, lightStateStatus.data]);  
 
   // Timer for run time tracking
   useEffect(() => {
@@ -92,8 +127,9 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
         ...prev,
         isOn: !prev.isOn,
         lastActivated: !prev.isOn ? new Date() : prev.lastActivated,
-      }
-      onStateChange?.("light", newState)
+      };
+      updateLightStatus(newState.isOn);
+      onStateChange?.("light", newState);
       return newState
     })
   }
@@ -104,8 +140,9 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
         ...prev,
         isOn: !prev.isOn,
         lastActivated: !prev.isOn ? new Date() : prev.lastActivated,
-      }
-      onStateChange?.("fan", newState)
+      };
+      updateFanStatus(newState.isOn);
+      onStateChange?.("fan", newState);
       return newState
     })
   }
@@ -117,6 +154,7 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
         isOn: !prev.isOn,
         lastActivated: !prev.isOn ? new Date() : prev.lastActivated,
       }
+      updatePumpStatus(newState.isOn);
       onStateChange?.("pump", newState)
       return newState
     })
@@ -151,6 +189,7 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
   const toggleLightAutomatic = () => {
     setLightState((prev) => {
       const newState = { ...prev, isAutomatic: !prev.isAutomatic }
+      updateLightStateStatus(newState.isAutomatic);
       onStateChange?.("light", newState)
       return newState
     })
@@ -159,6 +198,7 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
   const toggleFanAutomatic = () => {
     setFanState((prev) => {
       const newState = { ...prev, isAutomatic: !prev.isAutomatic }
+      updateFanStateStatus(newState.isAutomatic);
       onStateChange?.("fan", newState)
       return newState
     })
@@ -167,6 +207,7 @@ export function ActuatorControlPanel({ className, onStateChange }: ActuatorContr
   const togglePumpAutomatic = () => {
     setPumpState((prev) => {
       const newState = { ...prev, isAutomatic: !prev.isAutomatic }
+      updatePumpStateStatus(newState.isAutomatic);
       onStateChange?.("pump", newState)
       return newState
     })
