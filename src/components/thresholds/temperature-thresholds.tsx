@@ -19,10 +19,11 @@ export function TemperatureThresholds({
   className,
 }: TemperatureThresholdsProps) {
   const t = useTranslation()
-  const { status } = useTemperatureThresholdHook();
+  const { status, updateStatus } = useTemperatureThresholdHook();
 
   const handleThresholdChange = (low: number, high: number) => {
     onThresholdChange?.(low, high)
+    updateStatus({"low": low, "high": high})
   }
 
   return (

@@ -24,11 +24,12 @@ export function CO2Thresholds({
   className,
 }: CO2ThresholdsProps) {
   const t = useTranslation()
-  const { status } = useCo2LevelThresholdHook();
+  const { status, updateStatus } = useCo2LevelThresholdHook();
   const [enableVentilation, setEnableVentilation] = useState(true)
 
   const handleThresholdChange = (low: number, high: number) => {
     onThresholdChange?.(low, high)
+    updateStatus({"low": low, "high": high})
   }
 
   return (

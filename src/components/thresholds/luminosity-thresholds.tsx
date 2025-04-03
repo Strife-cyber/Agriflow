@@ -26,15 +26,17 @@ export function LuminosityThresholds({
   className,
 }: LuminosityThresholdsProps) {
   const t = useTranslation();
-  const { status } = useLuminosityThresholdHook();
+  const { status, updateStatus } = useLuminosityThresholdHook();
   const [_, setUnit] = useState<"%" | "lux">("%");
 
   const handleThresholdChangePercent = (low: number, high: number) => {
     onThresholdChange?.(low, high, "%")
+    updateStatus({"low": ((low/100) * 100000), "high": ((high/100) * 100000)})
   }
 
   const handleThresholdChangeLux = (low: number, high: number) => {
     onThresholdChange?.(low, high, "lux")
+    updateStatus({"low": low, "high": high})
   }
 
   return (

@@ -20,11 +20,12 @@ export function SoilHumidityThresholds({
   className,
 }: SoilHumidityThresholdsProps) {
   const t = useTranslation();
-  const { status } = useSoilHumidityThresholdHook();
+  const { status, updateStatus } = useSoilHumidityThresholdHook();
   const [cropType, setCropType] = useState("general");
 
   const handleThresholdChange = (low: number, high: number) => {
     onThresholdChange?.(low, high);
+    updateStatus({"low": low, "high": high})
   };
 
   // Preset thresholds for different crop types

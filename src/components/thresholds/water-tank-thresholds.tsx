@@ -23,11 +23,12 @@ export function WaterTankThresholds({
   className,
 }: WaterTankThresholdsProps) {
   const t = useTranslation()
-  const { status } = useWaterTankThresholdHook();
+  const { status, updateStatus } = useWaterTankThresholdHook();
   const [autoRefill, setAutoRefill] = useState(true)
 
   const handleThresholdChange = (low: number, high: number) => {
     onThresholdChange?.(low, high)
+    updateStatus({"low": low, "high": high})
   }
 
   return (
