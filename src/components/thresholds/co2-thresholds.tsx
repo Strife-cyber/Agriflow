@@ -6,6 +6,9 @@ import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { useTranslation } from "@/context/translation"
+import { useCo2LevelThresholdHook } from "@/hooks/threshold-hook"
+import { Progress } from "../ui/progress"
+import { ProgressIndicator } from "@radix-ui/react-progress"
 
 interface CO2ThresholdsProps {
   defaultLowThreshold?: number
@@ -21,13 +24,11 @@ export function CO2Thresholds({
   className,
 }: CO2ThresholdsProps) {
   const t = useTranslation()
-  const [enableAlerts, setEnableAlerts] = useState(true)
+  const { status } = useCo2LevelThresholdHook();
   const [enableVentilation, setEnableVentilation] = useState(true)
 
   const handleThresholdChange = (low: number, high: number) => {
-    if (enableAlerts) {
-      onThresholdChange?.(low, high)
-    }
+    onThresholdChange?.(low, high)
   }
 
   return (
@@ -40,56 +41,53 @@ export function CO2Thresholds({
             </div>
             <span>{t("co2_level_thresholds")}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="co2-alerts" className="text-sm text-gray-500">
-              {t("alerts")}
-            </Label>
-            <Switch
-              id="co2-alerts"
-              checked={enableAlerts}
-              onCheckedChange={setEnableAlerts}
-              className="data-[state=checked]:bg-green-600"
-            />
-          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <ThresholdSlider
-          label={t("co2_level_range")}
-          minValue={300}
-          maxValue={2500}
-          step={50}
-          unit=" ppm"
-          defaultLowThreshold={defaultLowThreshold}
-          defaultHighThreshold={defaultHighThreshold}
-          onThresholdChange={handleThresholdChange}
-          colorScheme="co2"
-        />
-
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Switch
-              id="auto-ventilation"
-              checked={enableVentilation}
-              onCheckedChange={setEnableVentilation}
-              className="data-[state=checked]:bg-green-600"
+      {
+        status.isLoading ? (
+          <Progress>
+            <ProgressIndicator/>
+          </Progress>
+        ) : (
+          <CardContent className="p-4">
+            <ThresholdSlider
+              label={t("co2_level_range")}
+              minValue={300}
+              maxValue={2500}
+              step={50}
+              unit=" ppm"
+              defaultLowThreshold={ status.data?.low || defaultLowThreshold}
+              defaultHighThreshold={ status.data?.high || defaultHighThreshold }
+              onThresholdChange={handleThresholdChange}
+              colorScheme="co2"
             />
-            <Label htmlFor="auto-ventilation" className="text-sm text-gray-700">
-              {t("automatic_ventilation_control")}
-            </Label>
-          </div>
-          {enableVentilation && <Badge className="bg-green-100 text-green-700">{t("active")}</Badge>}
-        </div>
 
-        <div className="mt-4 text-sm text-gray-600">
-          <p>{t("set_co2_thresholds")}</p>
-          <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>{t("suboptimal_plant_growth", { value: defaultLowThreshold })}</li>
-            <li>{t("potentially_harmful_levels", { value: defaultHighThreshold })}</li>
-            <li>{t("dangerous_human_exposure")}</li>
-          </ul>
-        </div>
-      </CardContent>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Switch
+                  id="auto-ventilation"
+                  checked={enableVentilation}
+                  onCheckedChange={setEnableVentilation}
+                  className="data-[state=checked]:bg-green-600"
+                />
+                <Label htmlFor="auto-ventilation" className="text-sm text-gray-700">
+                  {t("automatic_ventilation_control")}
+                </Label>
+              </div>
+              {enableVentilation && <Badge className="bg-green-100 text-green-700">{t("active")}</Badge>}
+            </div>
+
+            <div className="mt-4 text-sm text-gray-600">
+              <p>{t("set_co2_thresholds")}</p>
+              <ul className="mt-2 list-disc list-inside space-y-1">
+                <li>{t("suboptimal_plant_growth", { value: status.data?.low || defaultLowThreshold })}</li>
+                <li>{t("potentially_harmful_levels", { value: status.data?.high || defaultHighThreshold })}</li>
+                <li>{t("dangerous_human_exposure")}</li>
+              </ul>
+            </div>
+          </CardContent>
+        )
+      }
     </Card>
   )
 }

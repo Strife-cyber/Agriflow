@@ -1,10 +1,9 @@
-import { useState } from "react";
 import { Thermometer } from "lucide-react";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { ThresholdSlider } from "./threshold-slider";
 import { useTranslation } from "@/context/translation";
+import { useTemperatureThresholdHook } from "@/hooks/threshold-hook";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress, ProgressIndicator } from "@radix-ui/react-progress";
 
 interface TemperatureThresholdsProps {
   defaultLowThreshold?: number
@@ -14,18 +13,16 @@ interface TemperatureThresholdsProps {
 }
 
 export function TemperatureThresholds({
-  defaultLowThreshold = 15,
-  defaultHighThreshold = 30,
+  defaultLowThreshold,
+  defaultHighThreshold,
   onThresholdChange,
   className,
 }: TemperatureThresholdsProps) {
   const t = useTranslation()
-  const [enableAlerts, setEnableAlerts] = useState(true)
+  const { status } = useTemperatureThresholdHook();
 
   const handleThresholdChange = (low: number, high: number) => {
-    if (enableAlerts) {
-      onThresholdChange?.(low, high)
-    }
+    onThresholdChange?.(low, high)
   }
 
   return (
@@ -38,41 +35,41 @@ export function TemperatureThresholds({
             </div>
             <span>{t("temperatureThresholdsTitle")}</span>
           </div>
-          <div className="hidden min-[390px]:flex items-center space-x-2">
-            <Label htmlFor="temp-alerts" className="text-sm text-gray-500">
-              {t("temperatureThresholdsAlerts")}
-            </Label>
-            <Switch
-              id="temp-alerts"
-              checked={enableAlerts}
-              onCheckedChange={setEnableAlerts}
-              className="data-[state=checked]:bg-green-600"
-            />
-          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <ThresholdSlider
-          label={t("temperatureThresholdsRange")}
-          minValue={-10}
-          maxValue={50}
-          step={0.5}
-          unit="°C"
-          defaultLowThreshold={defaultLowThreshold}
-          defaultHighThreshold={defaultHighThreshold}
-          onThresholdChange={handleThresholdChange}
-          colorScheme="temperature"
-          decimals={1}
-        />
+      { 
+        status.isLoading ? (
+          <>
+            <Progress>
+              <ProgressIndicator/>
+            </Progress>
+          </>
+        ) 
+        : (
+          <CardContent className="p-4">
+            <ThresholdSlider
+              label={t("temperatureThresholdsRange")}
+              minValue={-10}
+              maxValue={50}
+              step={0.5}
+              unit="°C"
+              defaultLowThreshold={status.data?.low || defaultLowThreshold}
+              defaultHighThreshold={status.data?.high || defaultHighThreshold}
+              onThresholdChange={handleThresholdChange}
+              colorScheme="temperature"
+              decimals={1}
+            />
 
-        <div className="mt-4 text-sm text-gray-600">
-          <p>{t("temperatureThresholdsDescription")}</p>
-          <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>{t("temperatureThresholdsRiskCold", { value: defaultLowThreshold })}</li>
-            <li>{t("temperatureThresholdsRiskHeat", { value: defaultHighThreshold })}</li>
-          </ul>
-        </div>
-      </CardContent>
+            <div className="mt-4 text-sm text-gray-600">
+              <p>{t("temperatureThresholdsDescription")}</p>
+              <ul className="mt-2 list-disc list-inside space-y-1">
+                <li>{t("temperatureThresholdsRiskCold", { value: status.data?.low || defaultLowThreshold })}</li>
+                <li>{t("temperatureThresholdsRiskHeat", { value: status.data?.high || defaultHighThreshold })}</li>
+              </ul>
+            </div>
+          </CardContent>
+        )  
+      }
     </Card>
   )
 }

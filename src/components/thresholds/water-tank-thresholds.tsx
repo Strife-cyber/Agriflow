@@ -2,10 +2,12 @@ import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Droplet } from "lucide-react"
 import { ThresholdSlider } from "./threshold-slider"
-import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useTranslation } from "@/context/translation"
+import { useWaterTankThresholdHook } from "@/hooks/threshold-hook"
+import { Progress } from "../ui/progress"
+import { ProgressIndicator } from "@radix-ui/react-progress"
 
 interface WaterTankThresholdsProps {
   defaultLowThreshold?: number
@@ -21,13 +23,11 @@ export function WaterTankThresholds({
   className,
 }: WaterTankThresholdsProps) {
   const t = useTranslation()
-  const [enableAlerts, setEnableAlerts] = useState(true)
+  const { status } = useWaterTankThresholdHook();
   const [autoRefill, setAutoRefill] = useState(true)
 
   const handleThresholdChange = (low: number, high: number) => {
-    if (enableAlerts) {
-      onThresholdChange?.(low, high)
-    }
+    onThresholdChange?.(low, high)
   }
 
   return (
@@ -40,52 +40,52 @@ export function WaterTankThresholds({
             </div>
             <span>{t("water_tank_thresholds")}</span>
           </div>
-          <div className="flex items-center space-x-2">
-            <Label htmlFor="tank-alerts" className="text-sm text-gray-500">
-              {t("alerts")}
-            </Label>
-            <Switch
-              id="tank-alerts"
-              checked={enableAlerts}
-              onCheckedChange={setEnableAlerts}
-              className="data-[state=checked]:bg-green-600"
-            />
-          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <ThresholdSlider
-          label={t("water_tank_level_range")}
-          minValue={0}
-          maxValue={100}
-          step={1}
-          unit="%"
-          defaultLowThreshold={defaultLowThreshold}
-          defaultHighThreshold={defaultHighThreshold}
-          onThresholdChange={handleThresholdChange}
-          colorScheme="level"
-        />
+      {
+        status.isLoading ? (
+          <>
+            <Progress>
+              <ProgressIndicator/>
+            </Progress>
+          </>
+        )
+        : (
+          <CardContent className="p-4">
+            <ThresholdSlider
+              label={t("water_tank_level_range")}
+              minValue={0}
+              maxValue={100}
+              step={1}
+              unit="%"
+              defaultLowThreshold={ status.data?.low || defaultLowThreshold}
+              defaultHighThreshold={ status.data?.high || defaultHighThreshold}
+              onThresholdChange={handleThresholdChange}
+              colorScheme="level"
+            />
 
-        <div className="mt-4 flex items-center space-x-2">
-          <Checkbox
-            id="auto-refill"
-            checked={autoRefill}
-            onCheckedChange={(checked) => setAutoRefill(checked as boolean)}
-            className="data-[state=checked]:bg-green-600 border-gray-300"
-          />
-          <Label htmlFor="auto-refill" className="text-sm text-gray-700">
-            {t("enable_auto_refill")}
-          </Label>
-        </div>
+            <div className="mt-4 flex items-center space-x-2">
+              <Checkbox
+                id="auto-refill"
+                checked={autoRefill}
+                onCheckedChange={(checked) => setAutoRefill(checked as boolean)}
+                className="data-[state=checked]:bg-green-600 border-gray-300"
+              />
+              <Label htmlFor="auto-refill" className="text-sm text-gray-700">
+                {t("enable_auto_refill")}
+              </Label>
+            </div>
 
-        <div className="mt-4 text-sm text-gray-600">
-          <p>{t("set_water_tank_thresholds")}</p>
-          <ul className="mt-2 list-disc list-inside space-y-1">
-            <li>{t("low_water_warning", { value: defaultLowThreshold })}</li>
-            <li>{t("high_water_warning", { value: defaultHighThreshold })}</li>
-          </ul>
-        </div>
-      </CardContent>
+            <div className="mt-4 text-sm text-gray-600">
+              <p>{t("set_water_tank_thresholds")}</p>
+              <ul className="mt-2 list-disc list-inside space-y-1">
+                <li>{t("low_water_warning", { value: status.data?.low || defaultLowThreshold })}</li>
+                <li>{t("high_water_warning", { value: status.data?.high || defaultHighThreshold })}</li>
+              </ul>
+            </div>
+          </CardContent>
+        )
+      }
     </Card>
   )
 }

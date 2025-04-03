@@ -1,14 +1,12 @@
-import type React from "react"
-
-import { useState } from "react"
-import { motion } from "framer-motion"
-import { Slider } from "@/components/ui/slider"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, Check } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { useTranslation } from "@/context/translation"
+import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Slider } from "@/components/ui/slider";
+import { Button } from "@/components/ui/button";
+import { AlertTriangle, Check } from "lucide-react";
+import { useTranslation } from "@/context/translation";
 
 interface ThresholdSliderProps {
   label: string
@@ -132,6 +130,13 @@ export function ThresholdSlider({
     setIsDirty(false)
     setError(null)
   }
+
+  useEffect(() => {
+    setLowThreshold(defaultLowThreshold);
+    setHighThreshold(defaultHighThreshold);
+    setLowInput(defaultLowThreshold.toFixed(decimals));
+    setHighInput(defaultHighThreshold.toFixed(decimals));
+  }, [defaultLowThreshold, defaultHighThreshold]);
 
   return (
     <div className={cn("space-y-4 p-4 bg-white rounded-lg border border-gray-200", className)}>
