@@ -1,5 +1,3 @@
-"use client"
-
 import type React from "react"
 
 import { useState, useEffect, useMemo } from "react"
@@ -32,9 +30,10 @@ import { SensorDataAnomalyDetection } from "@/components/data-analysis/sensor-da
 import AppLayout from "@/layouts/app-layout"
 import { BreadcrumbItem } from "@/index"
 import { useTranslation } from "@/context/translation"
+import ReadingsHook from "@/hooks/readings-hook"
 
 // Define sensor types
-export type SensorType = "temperature" | "soil_humidity" | "co2_level" | "water_tank_level" | "luminosity"
+export type SensorType = "temperature" | "soilhumidity" | "co2level" | "watertank" | "light"
 
 // Define sensor data interface
 export interface SensorData {
@@ -75,7 +74,7 @@ const sensors: SensorMetadata[] = [
   {
     id: "soil-hum-sensor-1",
     name: "Soil Humidity Sensor",
-    type: "soil_humidity",
+    type: "soilhumidity",
     unit: "%",
     minValue: 0,
     maxValue: 100,
@@ -86,7 +85,7 @@ const sensors: SensorMetadata[] = [
   {
     id: "co2-sensor-1",
     name: "CO2 Level Sensor",
-    type: "co2_level",
+    type: "co2level",
     unit: "ppm",
     minValue: 0,
     maxValue: 5000,
@@ -97,7 +96,7 @@ const sensors: SensorMetadata[] = [
   {
     id: "water-tank-sensor-1",
     name: "Water Tank Level Sensor",
-    type: "water_tank_level",
+    type: "watertank",
     unit: "%",
     minValue: 0,
     maxValue: 100,
@@ -108,7 +107,7 @@ const sensors: SensorMetadata[] = [
   {
     id: "light-sensor-1",
     name: "Luminosity Sensor",
-    type: "luminosity",
+    type: "light",
     unit: "lux",
     minValue: 0,
     maxValue: 100000,
@@ -118,62 +117,12 @@ const sensors: SensorMetadata[] = [
   },
 ]
 
-// Generate mock data for each sensor
-const generateMockData = (
-  sensorId: string,
-  days = 30,
-  readingsPerDay = 24,
-  minValue: number,
-  maxValue: number,
-): SensorData[] => {
-  const data: SensorData[] = []
-
-  for (let day = 0; day < days; day++) {
-    const date = subDays(new Date(), days - day)
-
-    for (let hour = 0; hour < readingsPerDay; hour++) {
-      const timestamp = new Date(date)
-      timestamp.setHours(hour)
-      timestamp.setMinutes(0)
-      timestamp.setSeconds(0)
-
-      // Generate a value with some randomness but also a pattern
-      // Morning values increase, evening values decrease
-      const timeOfDayFactor =
-        hour < 12
-          ? hour / 12 // Morning: increasing
-          : (24 - hour) / 12 // Evening: decreasing
-
-      // Add some day-to-day variation
-      const dayVariation = Math.sin(day / 5) * 0.2
-
-      // Add some randomness
-      const randomFactor = Math.random() * 0.2 - 0.1
-
-      // Calculate the normalized value between 0 and 1
-      const normalizedValue = 0.3 + timeOfDayFactor * 0.5 + dayVariation + randomFactor
-
-      // Scale to the sensor's range
-      const value = minValue + normalizedValue * (maxValue - minValue)
-
-      data.push({
-        id: `${sensorId}-${day}-${hour}`,
-        timestamp: timestamp.toISOString(),
-        value: Number(value.toFixed(2)),
-        sensorId,
-        location: sensors.find((s) => s.id === sensorId)?.location,
-      })
-    }
-  }
-
-  return data
-}
-
 export default function SensorDataAnalysis() {
   // State for selected sensor
   const translation = useTranslation();
   const [selectedSensorId, setSelectedSensorId] = useState<string>(sensors[0].id)
   const selectedSensor = sensors.find((s) => s.id === selectedSensorId) || sensors[0]
+  const sensorHook = ReadingsHook(`${selectedSensor.type}reading`);
 
   // State for active tab
   const [activeTab, setActiveTab] = useState<string>("chart")
@@ -197,19 +146,30 @@ export default function SensorDataAnalysis() {
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true)
-
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       const data: Record<string, SensorData[]> = {}
 
-      // Generate data for each sensor
-      sensors.forEach((sensor) => {
-        data[sensor.id] = generateMockData(sensor.id, 30, 24, sensor.minValue, sensor.maxValue)
-      })
+      try {
+        for (const sensor of sensors) {
+          const sensorHook = ReadingsHook(`${sensor.type}reading`);
+          const readings = await sensorHook.getAnalyticsData(1);
 
-      setAllSensorData(data)
-      setIsLoading(false)
+          if (readings.data) {
+            data[sensor.id] = readings.data.map((reading: any) => ({
+              id: reading.id || crypto.randomUUID(),
+              timestamp: reading.createdAt,
+              value: reading.value,
+              sensorId: crypto.randomUUID,
+              location: "",
+              notes: ""
+            }));
+          }
+        }
+        setAllSensorData(data);
+      } catch (error) {
+        console.error('Error loading sensor data:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
 
     loadData()
@@ -277,21 +237,32 @@ export default function SensorDataAnalysis() {
 
   // Handle refresh
   const handleRefresh = async () => {
-    setIsLoading(true)
-
-    // Simulate API delay
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    const data: Record<string, SensorData[]> = {}
-
-    // Generate new data for each sensor
-    sensors.forEach((sensor) => {
-      data[sensor.id] = generateMockData(sensor.id, 30, 24, sensor.minValue, sensor.maxValue)
-    })
-
-    setAllSensorData(data)
-    setIsLoading(false)
-  }
+    setIsLoading(true);
+    try {
+      const data: Record<string, SensorData[]> = {};
+      
+      for (const sensor of sensors) {
+        const sensorHook = ReadingsHook(sensor.type);
+        const readings = await sensorHook.getAnalyticsData(1);
+        
+        if (readings) {
+          data[sensor.id] = readings.map((reading: any) => ({
+            id: reading.id || crypto.randomUUID(),
+            timestamp: reading.createdAt,
+            value: reading.value,
+            sensorId: sensor.id,
+            location: sensor.location,
+            notes: reading.notes || ''
+          }));
+        }
+      }
+      setAllSensorData(data);
+    } catch (error) {
+      console.error('Error refreshing sensor data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Handle export
   const handleExport = () => {
@@ -326,6 +297,38 @@ export default function SensorDataAnalysis() {
           href: '/analytics',
       },
   ];
+
+  const fetchDateRangeData = async () => {
+    if (!dateRange.from || !dateRange.to) return;
+
+    setIsLoading(true);
+    try {
+      const readings = await sensorHook.getReadingsInDateRange(dateRange.from, dateRange.to);
+      if (readings) {
+        const newData = {
+          ...allSensorData,
+          [selectedSensorId]: readings.map((reading: any) => ({
+            id: reading.id || crypto.randomUUID(),
+            timestamp: reading.createdAt,
+            value: reading.value,
+            sensorId: selectedSensorId,
+            location: selectedSensor.location,
+            notes: reading.notes || ''
+          }))
+        };
+        setAllSensorData(newData);
+      }
+    } catch (error) {
+      console.error('Error fetching date range data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Update date range effect
+  useEffect(() => {
+    fetchDateRangeData();
+  }, [dateRange, selectedSensorId]);
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
