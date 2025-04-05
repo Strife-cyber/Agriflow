@@ -1,5 +1,3 @@
-import type React from "react"
-
 import { useState, useEffect, useMemo } from "react"
 import {
   Calendar,
@@ -15,7 +13,7 @@ import {
   Sun,
   BarChart3,
 } from "lucide-react"
-import { format, subDays, isAfter, isBefore, parseISO } from "date-fns"
+import { format, subDays } from "date-fns"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -31,6 +29,7 @@ import AppLayout from "@/layouts/app-layout"
 import { BreadcrumbItem } from "@/index"
 import { useTranslation } from "@/context/translation"
 import ReadingsHook from "@/hooks/readings-hook"
+import { Input } from "@/components/ui/input" // Add this import for page input
 
 // Define sensor types
 export type SensorType = "temperature" | "soilhumidity" | "co2level" | "watertank" | "light"
@@ -45,20 +44,19 @@ export interface SensorData {
   notes?: string
 }
 
-// Define sensor metadata
+// [Type definitions remain mostly the same]
 export interface SensorMetadata {
   id: string
   name: string
   type: SensorType
   unit: string
-  minValue: number
-  maxValue: number
+  minValue: number // We'll update these dynamically
+  maxValue: number // We'll update these dynamically
   location: string
   icon: React.ReactNode
   color: string
 }
 
-// Sensor metadata
 const sensors: SensorMetadata[] = [
   {
     id: "temp-sensor-1",
@@ -118,79 +116,108 @@ const sensors: SensorMetadata[] = [
 ]
 
 export default function SensorDataAnalysis() {
-  // State for selected sensor
   const translation = useTranslation();
-  const [selectedSensorId, setSelectedSensorId] = useState<string>(sensors[0].id)
-  const selectedSensor = sensors.find((s) => s.id === selectedSensorId) || sensors[0]
+  const [selectedSensorId, setSelectedSensorId] = useState<string>(sensors[0].id);
+  const selectedSensor = sensors.find((s) => s.id === selectedSensorId) || sensors[0];
   const sensorHook = ReadingsHook(`${selectedSensor.type}reading`);
-
-  // State for active tab
-  const [activeTab, setActiveTab] = useState<string>("chart")
-
-  // State for date range
+  
+  const [activeTab, setActiveTab] = useState<string>("chart");
   const [dateRange, setDateRange] = useState<{
-    from: Date | undefined
-    to: Date | undefined
+    from: Date | undefined;
+    to: Date | undefined;
   }>({
     from: subDays(new Date(), 7),
     to: new Date(),
-  })
+  });
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [allSensorData, setAllSensorData] = useState<Record<string, SensorData[]>>({});
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>(1);
+  const [sensorMetadata, setSensorMetadata] = useState<SensorMetadata[]>(sensors);
 
-  // State for loading
-  const [isLoading, setIsLoading] = useState<boolean>(true)
-
-  // State for all sensor data
-  const [allSensorData, setAllSensorData] = useState<Record<string, SensorData[]>>({})
-
-  // Generate and load mock data
+  // Load initial data and update min/max values
   useEffect(() => {
-    const loadData = async () => {
-      setIsLoading(true)
-      const data: Record<string, SensorData[]> = {}
+    const initializeData = async () => {
+      setIsLoading(true);
+      const data: Record<string, SensorData[]> = {};
+      const updatedSensors = [...sensorMetadata];
 
       try {
-        for (const sensor of sensors) {
+        for (let i = 0; i < sensors.length; i++) {
+          const sensor = sensors[i];
           const sensorHook = ReadingsHook(`${sensor.type}reading`);
-          const readings = await sensorHook.getAnalyticsData(1);
+          
+          // Get min/max values
+          const minValue = await sensorHook.getRangeValue(true) ?? sensor.minValue;
+          const maxValue = await sensorHook.getRangeValue(false) ?? sensor.maxValue;
+          updatedSensors[i] = { ...sensor, minValue, maxValue };
 
-          if (readings.data) {
+          // Get initial data
+          const readings = await sensorHook.getAnalyticsData(currentPage);
+          if (readings?.data) {
             data[sensor.id] = readings.data.map((reading: any) => ({
               id: reading.id || crypto.randomUUID(),
               timestamp: reading.createdAt,
               value: reading.value,
-              sensorId: crypto.randomUUID,
-              location: "",
-              notes: ""
+              sensorId: sensor.id,
+              location: sensor.location,
+              notes: reading.notes || ""
             }));
+            setTotalPages(readings.size || 1);
           }
         }
+        setSensorMetadata(updatedSensors);
         setAllSensorData(data);
       } catch (error) {
-        console.error('Error loading sensor data:', error);
+        console.error('Error initializing sensor data:', error);
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
-    loadData()
-  }, [])
+    initializeData();
+  }, [currentPage]);
 
-  // Filter data based on date range
+  // Fetch data for date range when it changes
+  useEffect(() => {
+    const fetchDateRangeData = async () => {
+      if (!dateRange.from || !dateRange.to) return;
+
+      setIsLoading(true);
+      try {
+        const readings = await sensorHook.getReadingsInDateRange(dateRange.from, dateRange.to);
+        if (readings?.data) {
+          const newData = {
+            ...allSensorData,
+            [selectedSensorId]: readings.data.map((reading: any) => ({
+              id: reading.id || crypto.randomUUID(),
+              timestamp: reading.createdAt,
+              value: reading.value,
+              sensorId: selectedSensorId,
+              location: selectedSensor.location,
+              notes: reading.notes || ''
+            }))
+          };
+          setAllSensorData(newData);
+          setTotalPages(readings.totalPages || 1);
+        }
+      } catch (error) {
+        console.error('Error fetching date range data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDateRangeData();
+  }, [dateRange, selectedSensorId]);
+
   const filteredData = useMemo(() => {
-    if (!allSensorData[selectedSensorId]) return []
+    if (!allSensorData[selectedSensorId]) return [];
+    return allSensorData[selectedSensorId];
+  }, [allSensorData, selectedSensorId]);
 
-    return allSensorData[selectedSensorId].filter((item) => {
-      const itemDate = parseISO(item.timestamp)
-
-      const afterFrom =
-        !dateRange.from || isAfter(itemDate, dateRange.from) || itemDate.getTime() === dateRange.from.getTime()
-      const beforeTo =
-        !dateRange.to || isBefore(itemDate, dateRange.to) || itemDate.getTime() === dateRange.to.getTime()
-
-      return afterFrom && beforeTo
-    })
-  }, [allSensorData, selectedSensorId, dateRange])
-
+  // [Stats calculation remains the same]
+  
   // Calculate statistics
   const stats = useMemo(() => {
     if (filteredData.length === 0) {
@@ -235,18 +262,15 @@ export default function SensorDataAnalysis() {
     }
   }, [filteredData])
 
-  // Handle refresh
   const handleRefresh = async () => {
     setIsLoading(true);
     try {
       const data: Record<string, SensorData[]> = {};
-      
-      for (const sensor of sensors) {
-        const sensorHook = ReadingsHook(sensor.type);
-        const readings = await sensorHook.getAnalyticsData(1);
-        
-        if (readings) {
-          data[sensor.id] = readings.map((reading: any) => ({
+      for (const sensor of sensorMetadata) {
+        const sensorHook = ReadingsHook(`${sensor.type}reading`);
+        const readings = await sensorHook.getAnalyticsData(currentPage);
+        if (readings?.data) {
+          data[sensor.id] = readings.data.map((reading: any) => ({
             id: reading.id || crypto.randomUUID(),
             timestamp: reading.createdAt,
             value: reading.value,
@@ -254,6 +278,7 @@ export default function SensorDataAnalysis() {
             location: sensor.location,
             notes: reading.notes || ''
           }));
+          setTotalPages(readings.totalPages || 1);
         }
       }
       setAllSensorData(data);
@@ -264,7 +289,7 @@ export default function SensorDataAnalysis() {
     }
   };
 
-  // Handle export
+  // [handleExport remains the same]
   const handleExport = () => {
     if (filteredData.length === 0) return
 
@@ -291,48 +316,24 @@ export default function SensorDataAnalysis() {
     document.body.removeChild(link)
   }
 
-  const breadcrumbs: BreadcrumbItem[] = [
-      {
-          title: translation("dataAnalytics"),
-          href: '/analytics',
-      },
-  ];
-
-  const fetchDateRangeData = async () => {
-    if (!dateRange.from || !dateRange.to) return;
-
-    setIsLoading(true);
-    try {
-      const readings = await sensorHook.getReadingsInDateRange(dateRange.from, dateRange.to);
-      if (readings) {
-        const newData = {
-          ...allSensorData,
-          [selectedSensorId]: readings.map((reading: any) => ({
-            id: reading.id || crypto.randomUUID(),
-            timestamp: reading.createdAt,
-            value: reading.value,
-            sensorId: selectedSensorId,
-            location: selectedSensor.location,
-            notes: reading.notes || ''
-          }))
-        };
-        setAllSensorData(newData);
-      }
-    } catch (error) {
-      console.error('Error fetching date range data:', error);
-    } finally {
-      setIsLoading(false);
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  // Update date range effect
-  useEffect(() => {
-    fetchDateRangeData();
-  }, [dateRange, selectedSensorId]);
+  // [breadcrumbs remain the same]
+  const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: translation("dataAnalytics"),
+        href: '/analytics',
+    },
+  ];
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <div className="container mx-auto p-4 lg:p-6">
+        {/* [Header and top buttons remain the same] */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-4 md:mb-0">Sensor Data Analysis</h1>
 
@@ -359,8 +360,11 @@ export default function SensorDataAnalysis() {
           </div>
         </div>
 
-        {/* Sensor selection and date range filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+        {/* Sensor selection and filters */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          {/* [Sensor selection card remains the same] */}
+          {/* [Date range card remains the same] */}
+          {/* [Quick filters card remains the same] */}
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium">Select Sensor</CardTitle>
@@ -489,8 +493,45 @@ export default function SensorDataAnalysis() {
           </Card>
         </div>
 
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm font-medium">Pagination</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1 || isLoading}
+                >
+                  Previous
+                </Button>
+                <Input
+                  type="number"
+                  min={1}
+                  max={totalPages}
+                  value={currentPage}
+                  onChange={(e) => handlePageChange(parseInt(e.target.value))}
+                  className="w-20 text-center"
+                  disabled={isLoading}
+                />
+                <span>of {totalPages}</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages || isLoading}
+                >
+                  Next
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Sensor info and stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 p-6 md:grid-cols-4 gap-4 mb-6">
           <Card className="col-span-1">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium flex items-center">
@@ -512,7 +553,7 @@ export default function SensorDataAnalysis() {
                 <div className="flex justify-between">
                   <span className="text-sm text-gray-500">Range:</span>
                   <span className="text-sm font-medium">
-                    {selectedSensor.minValue} - {selectedSensor.maxValue} {selectedSensor.unit}
+                    {isLoading ? 'Loading...' : `${selectedSensor.minValue} - ${selectedSensor.maxValue} ${selectedSensor.unit}`}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -523,6 +564,8 @@ export default function SensorDataAnalysis() {
             </CardContent>
           </Card>
 
+          {/* [Stats card remains the same] */}
+          
           <Card className="col-span-3">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium">Statistics</CardTitle>
@@ -570,6 +613,7 @@ export default function SensorDataAnalysis() {
           </Card>
         </div>
 
+        {/* [Tabs and content remain mostly the same, just update data sources] */}
         {/* Main content tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid grid-cols-3 md:w-auto md:inline-flex mb-4">
@@ -753,8 +797,6 @@ export default function SensorDataAnalysis() {
             </div>
           </TabsContent>
         </Tabs>
-      </div>
     </AppLayout>
-  )
+  );
 }
-
