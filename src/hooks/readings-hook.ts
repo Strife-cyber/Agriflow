@@ -41,7 +41,6 @@ const ReadingsHook = (reading: string) => {
     const getAnalyticsData = async (page: number) => {
         try {
             const response = await axios.get(`${api}/${reading}?size=100&page=${page || 1}`);
-            console.log(response)
             if (response.status === 200) {
                 return response.data; // Assuming the response contains the readings
             } else {

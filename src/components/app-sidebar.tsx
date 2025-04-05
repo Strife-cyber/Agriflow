@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { NavFooter } from './nav-footer';
 import { useAuth } from '@/context/auth-context';
 import { useTranslation } from '@/context/translation';
-import {BarChart3, History, LayoutGrid, LeafIcon, UserCog2Icon } from 'lucide-react';
+import {BarChart3, Gauge, History, LayoutGrid, LeafIcon, UserCog2Icon } from 'lucide-react';
 import { 
     Sidebar, SidebarContent, 
     SidebarFooter, SidebarHeader, 
@@ -23,11 +23,11 @@ export function AppSidebar() {
             href: '/dashboard',
             icon: LayoutGrid,
         },
-        /*{
+        {
             title: translate("limit"),
             href: '/limit',
             icon: Gauge
-        },*/
+        },
         {
             title: translate("agriInnovation"),
             href: '/agriculture',
