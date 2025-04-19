@@ -131,6 +131,23 @@ const Controller = (model) => {
         }
     };
 
+    const getLatest = async (req, res) => {
+        try {
+            const latestRecord = await model.findOne({
+                order: [['createdAt', 'DESC']],
+            });
+    
+            if (!latestRecord) {
+                return res.status(404).json({ message: 'No records found' });
+            }
+    
+            res.status(200).json(latestRecord);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Error retrieving latest record', error });
+        }
+    }
+
     // Create a new record
     const create = async (req, res) => {
         try {
@@ -205,6 +222,7 @@ const Controller = (model) => {
         update,
         deleteOne,
         search,
+        getLatest
     };
 };
 

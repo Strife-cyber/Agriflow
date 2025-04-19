@@ -8,6 +8,7 @@ for (const modelName in ReadingControllers) {
   const basePath = `/${modelName.toLowerCase()}`;
 
   router.get(`${basePath}`, controller.getAll);
+  router.get(`${basePath}/latest`, controller.getLatest);
   router.get(`${basePath}/search`, controller.search);
   router.get(`${basePath}/:id`, controller.getOne);
   router.post(`${basePath}`, controller.create);
