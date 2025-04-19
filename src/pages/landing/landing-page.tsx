@@ -2,6 +2,7 @@ import LandingHero from "./landing-hero";
 import LandingStats from "./landing-stats";
 import LandingHeader from "./landing-header";
 import AppFooter from "@/components/app-footer";
+import LandingSolutions from "./landing-solutions";
 import LandingGetStarted from "./landing-get-started";
 
 export default function LandingPage() {
@@ -19,6 +20,9 @@ export default function LandingPage() {
 
         {/* Get Started Grid */}
         <LandingGetStarted/>
+
+        {/* Next-Gen Solutions */}
+        <LandingSolutions/>
       </main>
 
       {/* Footer */}

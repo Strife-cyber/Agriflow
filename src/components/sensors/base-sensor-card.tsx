@@ -19,7 +19,7 @@ export function BaseSensorCard({ title, icon, className, children, lastUpdated }
   return (
     <div className={cn("h-full", className)} data-aos={aos.fadeUp}>
       <Card   
-        className="h-[400px] min-w-[300px] bg-white border-gray-300 shadow-md transition-all hover:shadow-lg hover:border-gray-400"
+        className="h-full min-h-[400px] min-w-[300px] bg-white border-gray-300 shadow-md transition-all hover:shadow-lg hover:border-gray-400"
         style={{ padding: "0" }}
       >
         {/* Header Section */}
