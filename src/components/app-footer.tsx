@@ -3,6 +3,7 @@ import AppLogo from "./app-logo";
 import cn from "@/utils/class-merge";
 import { useAnimation, aos } from "@/context/aos";
 import { useTranslation } from "@/context/translation";
+import { FaTwitter, FaFacebookF, FaInstagram } from "react-icons/fa";
 
 const AppFooter: React.FC = (style: { style?: string }) => {
   useAnimation();
@@ -10,7 +11,7 @@ const AppFooter: React.FC = (style: { style?: string }) => {
 
   return (
     <footer className={cn(
-      "relative py-24 overflow-hidden isolate bg-black/50 text-white",
+      "relative py-24 overflow-hidden isolate bg-black text-white",
       style
     )}>
       {/* Background Elements */}
@@ -25,27 +26,24 @@ const AppFooter: React.FC = (style: { style?: string }) => {
           {/* Company Info */}
           <div className="col-span-2 space-y-6">
             <div className="flex items-center gap-3">
-              <AppLogo className="text-white"/>
+              <AppLogo className="text-white" />
             </div>
             <p className="text-white text-lg leading-relaxed">
-              { translation("heroHeading") }
+              {translation("heroHeading")}
             </p>
             <div className="flex gap-5">
               {['twitter', 'facebook', 'instagram'].map((platform, i) => (
                 <a 
                   key={platform}
-                  href="#" 
+                  href="#"
                   className="p-3 rounded-xl bg-white backdrop-blur-sm border border-gray-300 hover:border-emerald-400/40 transition-all duration-300 hover:-translate-y-1"
                   data-aos={aos.fadeRight}
                   data-aos-delay={i * 100}
                 >
-                  <svg 
-                    className="h-6 w-6 text-emerald-600 hover:text-cyan-600 transition-colors"
-                    fill="currentColor" 
-                    viewBox="0 0 24 24"
-                  >
-                    {/* SVG paths for each social platform */}
-                  </svg>
+                  {/* FontAwesome Icons */}
+                  {platform === "twitter" && <FaTwitter className="h-6 w-6 text-emerald-600 hover:text-cyan-600 transition-colors" />}
+                  {platform === "facebook" && <FaFacebookF className="h-6 w-6 text-emerald-600 hover:text-cyan-600 transition-colors" />}
+                  {platform === "instagram" && <FaInstagram className="h-6 w-6 text-emerald-600 hover:text-cyan-600 transition-colors" />}
                 </a>
               ))}
             </div>
@@ -54,13 +52,13 @@ const AppFooter: React.FC = (style: { style?: string }) => {
           {/* Services Links */}
           <div data-aos={aos.fadeUp} data-aos-delay="150">
             <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600 mb-6">
-              { translation("services") }
+              {translation("services")}
             </h3>
             <ul className="space-y-4">
               {[translation("iotSolutions"), translation("automatedFarming"), translation("dataAnalytics"), translation("cropSurveillance")].map((item, _) => (
                 <li key={item}>
                   <a 
-                    href="#" 
+                    href="#"
                     className="text-white hover:text-gray-900 flex items-center group transition-all duration-300"
                   >
                     <span className="mr-2 text-white opacity-0 group-hover:opacity-100 transition-opacity">▹</span>
@@ -74,13 +72,13 @@ const AppFooter: React.FC = (style: { style?: string }) => {
           {/* Legal Links */}
           <div data-aos={aos.fadeUp} data-aos-delay="200">
             <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-cyan-600 mb-6">
-              { translation("legal") }
+              {translation("legal")}
             </h3>
             <ul className="space-y-4">
               {[translation('Privacy'), translation('Terms'), translation('Copyright'), translation('License')].map((item, _) => (
                 <li key={item}>
                   <a 
-                    href="#" 
+                    href="#"
                     className="text-white hover:text-gray-900 flex items-center group transition-all duration-300"
                   >
                     <span className="mr-2 text-white opacity-0 group-hover:opacity-100 transition-opacity">▹</span>

@@ -33,7 +33,7 @@ export function WaterTankLevel({ value, className, lastUpdated }: WaterTankLevel
       lastUpdated={lastUpdated}
     >
       <div 
-        className="flex flex-col items-center h-full justify-center space-y-4 p-4"
+        className="flex flex-col items-center h-[250px] justify-center space-y-4 p-4"
         data-aos={aos.fadeUp}
       >
         <div 

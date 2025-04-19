@@ -163,7 +163,7 @@ export default function SensorDataAnalysis() {
               location: sensor.location,
               notes: reading.notes || ""
             }));
-            setTotalPages(readings.size || 1);
+            setTotalPages(readings.totalPages || 1);
           }
         }
         setSensorMetadata(updatedSensors);
@@ -209,7 +209,7 @@ export default function SensorDataAnalysis() {
     };
 
     fetchDateRangeData();
-  }, [dateRange, selectedSensorId]);
+  }, [dateRange]);
 
   const filteredData = useMemo(() => {
     if (!allSensorData[selectedSensorId]) return [];
@@ -361,7 +361,7 @@ export default function SensorDataAnalysis() {
         </div>
 
         {/* Sensor selection and filters */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
           {/* [Sensor selection card remains the same] */}
           {/* [Date range card remains the same] */}
           {/* [Quick filters card remains the same] */}
@@ -370,16 +370,16 @@ export default function SensorDataAnalysis() {
               <CardTitle className="text-sm font-medium">Select Sensor</CardTitle>
             </CardHeader>
             <CardContent>
-              <Select value={selectedSensorId} onValueChange={setSelectedSensorId}>
+              <Select value={selectedSensorId} onValueChange={(value) => setSelectedSensorId(value)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a sensor" />
+                  <SelectValue className="truncate" placeholder="Select a sensor" />
                 </SelectTrigger>
                 <SelectContent>
                   {sensors.map((sensor) => (
                     <SelectItem key={sensor.id} value={sensor.id}>
-                      <div className="flex items-center">
+                      <div className="flex items-center truncate">
                         {sensor.icon}
-                        <span className="ml-2">{sensor.name}</span>
+                        <span className="ml-2 truncate w-[100px] lg:w-full">{sensor.name}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -396,8 +396,8 @@ export default function SensorDataAnalysis() {
               <div className="flex items-center space-x-2">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start text-left font-normal">
-                      <Calendar className="mr-2 h-4 w-4" />
+                    <Button variant="outline" className="w-full justify-start text-left font-normal truncate">
+                      <Calendar className="mr-2 h-4 w-4 truncate" />
                       {dateRange.from ? (
                         dateRange.to ? (
                           <>
@@ -531,7 +531,7 @@ export default function SensorDataAnalysis() {
         </div>
 
         {/* Sensor info and stats */}
-        <div className="grid grid-cols-1 p-6 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-1 p-6 lg:grid-cols-4 gap-4 mb-6">
           <Card className="col-span-1">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg font-medium flex items-center">
@@ -576,7 +576,7 @@ export default function SensorDataAnalysis() {
                   <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
                 </div>
               ) : (
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-2 xl:grid-cols-5 gap-4">
                   <div className="bg-gray-50 p-3 rounded-lg">
                     <div className="text-sm text-gray-500">Minimum</div>
                     <div className="text-xl font-semibold">
@@ -615,7 +615,7 @@ export default function SensorDataAnalysis() {
 
         {/* [Tabs and content remain mostly the same, just update data sources] */}
         {/* Main content tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full p-4">
           <TabsList className="grid grid-cols-3 md:w-auto md:inline-flex mb-4">
             <TabsTrigger value="chart" className="flex items-center">
               <LineChart className="h-4 w-4 mr-2" />

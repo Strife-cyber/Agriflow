@@ -53,8 +53,41 @@ const ReadingsHook = (reading: string) => {
         }
     }
 
+    const getLatestReading = async () => {
+        try {
+            const response = await axios.get(`${api}/${reading}reading/latest`);
+            if (response.status === 200) {
+                return response.data;
+            } else {
+                console.error("Unexpected response status:", response.status);
+                return null;
+            }
+        } catch (error) {
+            console.error("Error fetching latest reading:", error);
+            return null;
+        }
+    }
+
+    /**
+     * Starts polling the latest reading every `intervalMs` milliseconds
+     * and calls the `onUpdate` callback with the new data.
+     * Returns a stop function to clear the interval.
+     */
+    const startLatestReadingPolling = (onUpdate: (data: any) => void, intervalMs = 5000) => {
+        const interval = setInterval(async () => {
+            const latest = await getLatestReading();
+            if (latest) {
+                onUpdate(latest);
+            }
+        }, intervalMs);
+
+        return () => clearInterval(interval); // Return stop function
+    };
+
     return {
-        getRangeValue, getReadingsInDateRange, getAnalyticsData
+        getRangeValue, 
+        getReadingsInDateRange, getAnalyticsData,
+        getLatestReading, startLatestReadingPolling
     };
 };
 
