@@ -4,11 +4,11 @@
 Thresholds thresholds;
 
 void initThresholds() {
-    thresholds.temp = {"temp", 0, 100};
-    thresholds.soil = {"soil", 0, 100};
-    thresholds.co2 = {"co2", 0, 1000};
-    thresholds.light = {"light", 0, 1024};
-    thresholds.water = {"water", 0, 100};
+    thresholds.temp = {"temp", 10, 35};
+    thresholds.soil = {"soil", 300, 800};
+    thresholds.co2 = {"co2", 400, 1000};
+    thresholds.light = {"light", 10000, 70000};
+    thresholds.water = {"water", 1000, 9000};
 }
 
 Threshold* getThreshold(const char* name) {
