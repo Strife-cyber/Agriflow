@@ -40,8 +40,10 @@ float readSensor(const String& sensor) {
     } else {
       Serial.println(F("🔌 MQ CO2 détecté"));
     }
-    value = mq_voltage; // Simplifié, calibration réelle nécessaire
+    value = mq_voltage * 400; // Simplifié, calibration réelle nécessaire
     Threshold* co2Thresh = getThreshold("co2");
+    Serial.print("Valeur co2: ");
+    Serial.println(value);
 
     if (value > co2Thresh->max) setActuatorState("fan", true); // Allumer ventillateur trops de co2
     if (value < co2Thresh->min) setActuatorState("fan", false); // Eteindre le ventillateur gaz trops petit
@@ -53,20 +55,21 @@ float readSensor(const String& sensor) {
     Serial.print(value);
     Serial.println(F("%"));
   } else if (sensor == "light") {
+    Threshold* lightThresh = getThreshold("light");
     float lecture = analogRead(PHOTO_PIN);
     float v = (lecture * 3.3) / 4095.0;
-    value = (5013 * v + 2532.5) / (2.5 - v);
+    value = (3.3 - v) * 10000 / v;
+    value = lightThresh->max / (value / 1000.0);
     if (value < 0) value = -value;
     Serial.print(F("Luminosité: "));
     Serial.print(value);
     Serial.println(F(" lx"));
-    Threshold* lightThresh = getThreshold("light");
     if (value < lightThresh->min) setActuatorState("light", true);  // allumer la lumiere il est trop obscure
     if (value > lightThresh->max) setActuatorState("light", false); // lumiere trop intense eteindre la lumiere
   } else if (sensor == "humidity") {
     value = analogRead(YL69_AO_PIN);
     Threshold* humidityThresh = getThreshold("soil");
-    value  = (value / humidityThresh->max) * 100; // remplacer la valeur par defaut ici qui est de 4096
+    value = 100.0 - ((value / 4095.0) * 100.0);  // Wet = higher % remplacer la valeur par defaut ici qui est de 4096
     Serial.print(F("Humidité du sol: "));
     Serial.print(value);
     Serial.println(F("%"));

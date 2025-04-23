@@ -1,7 +1,8 @@
 #include "sensors.h"
 #include "actuators.h"
-#include "mqtt_handler.h"
+#include "threshold.h"
 #include "web_server.h"
+#include "mqtt_handler.h"
 
 /**
  * @file main.cpp
@@ -71,6 +72,7 @@ void setup() {
   }
   
   initMQTT();
+  initThresholds();
 }
 
 void loop() {

@@ -506,8 +506,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             const data = JSON.stringify(thresholds);
-            // Save to localStorage
-            localStorage.setItem('agriTechThresholds', data);
             console.log(data);
             await fetch('/thresholds', {
                 method: 'POST',
@@ -568,9 +566,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         maxRange.dispatchEvent(event);
                     }
                 });
-                
-                // Remove from localStorage
-                localStorage.removeItem('agriTechThresholds');
             }
         });
     }
@@ -703,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Close mobile menu
-        if (navbarCollapse.classList.contains('show')) {
+        if (navbarCollapse && navbarCollapse.classList.contains('show')) {
             navbarCollapse.classList.remove('show');
         }
 
@@ -735,12 +730,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    getStartedBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        showPage('sensors');
-    });
+    if (getStartedBtn) {
+        getStartedBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showPage('sensors');
+        });
+    }
     
-    // Fetch value from server
+    // Fetch value from server - using the same API endpoints as the first code
     async function getValue(path) {
         try {
             const response = await fetch(`/${path}`);
@@ -748,6 +745,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return data.value;
         } catch (error) {
             console.error(`Error fetching ${path}:`, error);
+            // Return null on error, not placeholder data
             return null;
         }
     }
@@ -773,21 +771,39 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
 
+        if (!statusElement || !switchElement) return;
+
         switchElement.checked = state;
         if (state) {
             statusElement.textContent = translations[currentLang].devices.status.on;
             statusElement.classList.remove('status-off');
             statusElement.classList.add('status-on');
-            iconElement.classList.add('active');
+            
+            if (iconElement) {
+                iconElement.classList.add('active');
+                
+                // Add animation for fan when active
+                if (device === 'fan') {
+                    iconElement.style.animation = 'spin 2s linear infinite';
+                }
+            }
         } else {
             statusElement.textContent = translations[currentLang].devices.status.off;
             statusElement.classList.remove('status-on');
             statusElement.classList.add('status-off');
-            iconElement.classList.remove('active');
+            
+            if (iconElement) {
+                iconElement.classList.remove('active');
+                
+                // Remove animation when fan is inactive
+                if (device === 'fan') {
+                    iconElement.style.animation = 'none';
+                }
+            }
         }
     }
 
-    // Update device state on server
+    // Update device state on server - using the same API endpoint as the first code
     async function updateDevice(device, state) {
         try {
             const response = await fetch('/activate', {
@@ -799,12 +815,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             const result = await response.json();
             console.log(`Updated ${device} state:`, result);
+            return result;
         } catch (error) {
             console.error(`Error updating ${device}:`, error);
+            return null;
         }
     }
 
-    // Fetch and update all device states
+    // Fetch and update all device states - using the same API endpoints as the first code
     async function updateDeviceStates() {
         const fanState = await getValue('state/fan');
         const pumpState = await getValue('state/pump');
@@ -826,7 +844,8 @@ document.addEventListener('DOMContentLoaded', function() {
             datetime: now.toLocaleString(currentLang === 'fr' ? 'fr-FR' : 'en-US'),
             action: action,
             device: translations[currentLang].devices[device].title,
-            value: state ? translations[currentLang].devices.status.on : translations[currentLang].devices.status.off
+            value: state ? translations[currentLang].devices.status.on : translations[currentLang].devices.status.off,
+            user: "Admin"
         });
         
         localStorage.setItem('agriTechHistory', JSON.stringify(historyData));
@@ -836,29 +855,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    fanSwitch.addEventListener('change', async () => {
-        const state = fanSwitch.checked;
-        updateDeviceStatusDisplay('fan', state);
-        await updateDevice('fan', state);
-        logDeviceStatus('fan', state);
-    });
+    // Device switch event listeners
+    if (fanSwitch) {
+        fanSwitch.addEventListener('change', async () => {
+            const state = fanSwitch.checked;
+            updateDeviceStatusDisplay('fan', state);
+            await updateDevice('fan', state);
+            logDeviceStatus('fan', state);
+        });
+    }
     
-    pumpSwitch.addEventListener('change', async () => {
-        const state = pumpSwitch.checked;
-        updateDeviceStatusDisplay('pump', state);
-        await updateDevice('pump', state);
-        logDeviceStatus('pump', state);
-    });
+    if (pumpSwitch) {
+        pumpSwitch.addEventListener('change', async () => {
+            const state = pumpSwitch.checked;
+            updateDeviceStatusDisplay('pump', state);
+            await updateDevice('pump', state);
+            logDeviceStatus('pump', state);
+        });
+    }
     
-    lightSwitch.addEventListener('change', async () => {
-        const state = lightSwitch.checked;
-        updateDeviceStatusDisplay('light', state);
-        await updateDevice('light', state);
-        logDeviceStatus('light', state);
-    });
+    if (lightSwitch) {
+        lightSwitch.addEventListener('change', async () => {
+            const state = lightSwitch.checked;
+            updateDeviceStatusDisplay('light', state);
+            await updateDevice('light', state);
+            logDeviceStatus('light', state);
+        });
+    }
     
     // Pagination functions
     function generatePagination(totalPages) {
+        if (!historyPagination) return;
+        
         historyPagination.innerHTML = '';
         
         if (totalPages <= 1) {
@@ -923,13 +951,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // History functions
     function renderHistoryTable() {
+        if (!historyBody) return;
+        
         historyBody.innerHTML = '';
         
         if (historyData.length === 0) {
             const row = document.createElement('tr');
-            row.innerHTML = `<td colspan="4" class="text-center">${translations[currentLang].history.noData}</td>`;
+            row.innerHTML = `<td colspan="5" class="text-center">${translations[currentLang].history.noData}</td>`;
             historyBody.appendChild(row);
-            historyPagination.innerHTML = '';
+            if (historyPagination) historyPagination.innerHTML = '';
             return;
         }
         
@@ -947,6 +977,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <td>${entry.action}</td>
                 <td>${entry.device}</td>
                 <td>${entry.value}</td>
+                <td>${entry.user || 'System'}</td>
             `;
             historyBody.appendChild(row);
         }
@@ -955,90 +986,110 @@ document.addEventListener('DOMContentLoaded', function() {
         generatePagination(totalPages);
     }
     
-    clearHistoryBtn.addEventListener('click', () => {
-        if (confirm(translations[currentLang].history.confirmClear)) {
-            historyData = [];
-            localStorage.setItem('agriTechHistory', JSON.stringify(historyData));
-            renderHistoryTable();
-        }
-    });
+    if (clearHistoryBtn) {
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm(translations[currentLang].history.confirmClear)) {
+                historyData = [];
+                localStorage.setItem('agriTechHistory', JSON.stringify(historyData));
+                renderHistoryTable();
+            }
+        });
+    }
     
-    exportCSVBtn.addEventListener('click', () => {
-        if (historyData.length === 0) {
-            alert(translations[currentLang].history.noDataExport);
-            return;
+    if (exportCSVBtn) {
+        exportCSVBtn.addEventListener('click', () => {
+            if (historyData.length === 0) {
+                alert(translations[currentLang].history.noDataExport);
+                return;
+            }
+            
+            const headers = [
+                translations[currentLang].history.table.date,
+                translations[currentLang].history.table.action,
+                translations[currentLang].history.table.device,
+                translations[currentLang].history.table.value,
+                "User"
+            ];
+            
+            const csvHeader = headers.map(header => `"${header}"`).join(',') + '\n';
+            const csvRows = historyData.map(entry => {
+                return `"${entry.datetime}","${entry.action}","${entry.device}","${entry.value}","${entry.user || 'System'}"`;
+            }).join('\n');
+            
+            const csvContent = csvHeader + csvRows;
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `agritech_history_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.display = 'none';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+
+    // Update sensor readings - using the same API endpoints as the first code
+    async function updateSensors() {
+        if (refreshSensorsBtn) {
+            // Show loading state
+            refreshSensorsBtn.innerHTML = `<span class="loading-spinner"></span><span data-i18n="sensors.refresh">${translations[currentLang].sensors.refresh}</span>`;
         }
         
-        const headers = [
-            translations[currentLang].history.table.date,
-            translations[currentLang].history.table.action,
-            translations[currentLang].history.table.device,
-            translations[currentLang].history.table.value
-        ];
+        // Make actual API requests to get sensor values
+        const temp = await getValue("temp");
+        const soil = await getValue("soil");
+        const co2 = await getValue("co2");
+        const light = await getValue("light");
+        const water = await getValue("water");
         
-        const csvHeader = headers.map(header => `"${header}"`).join(',') + '\n';
-        const csvRows = historyData.map(entry => {
-            return `"${entry.datetime}","${entry.action}","${entry.device}","${entry.value}"`;
-        }).join('\n');
+        // Update gauges with actual values from API
+        if (tempGauge && temp !== null) {
+            tempGauge.style.height = `${(temp - 10) * 100 / 30}%`;
+        }
         
-        const csvContent = csvHeader + csvRows;
+        if (soilGauge && soil !== null) {
+            soilGauge.style.height = `${soil}%`;
+        }
         
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
+        if (co2Gauge && co2 !== null) {
+            co2Gauge.style.height = `${(co2 - 300) * 100 / 700}%`;
+        }
         
-        link.setAttribute('href', url);
-        link.setAttribute('download', `agritech_history_${new Date().toISOString().slice(0, 10)}.csv`);
-        link.style.display = 'none';
+        if (lightGauge && light !== null) {
+            lightGauge.style.height = `${light}%`;
+        }
         
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    });
-
-    // Update sensor readings
-    async function updateSensors() {
-        // Show loading state
-        refreshSensorsBtn.innerHTML = `<span class="loading-spinner"></span><span data-i18n="sensors.refresh">${translations[currentLang].sensors.refresh}</span>`;
-        
-        // For demo purposes, generate random values
-        // In a real application, these would come from API calls
-        const temp = Math.floor(Math.random() * 20) + 15; // 15-35°C
-        const soil = Math.floor(Math.random() * 50) + 30; // 30-80%
-        const co2 = Math.floor(Math.random() * 300) + 350; // 350-650 ppm
-        const light = Math.floor(Math.random() * 50) + 30; // 30-80%
-        const water = Math.floor(Math.random() * 60) + 40; // 40-100%
-        
-        // Get thresholds from localStorage
-        const savedThresholds = JSON.parse(localStorage.getItem('agriTechThresholds')) || {};
-        
-        // Update circular gauges
-        updateGauge('temp', temp, 0, 50);
-        updateGauge('soil', soil, 0, 100);
-        updateGauge('co2', co2, 300, 1000);
-        updateGauge('light', light, 0, 100);
-        updateGauge('water', water, 0, 100);
+        if (waterGauge && water !== null) {
+            waterGauge.style.height = `${water}%`;
+        }
         
         // Update values
-        document.getElementById('tempValue').textContent = `${temp}°C`;
-        document.getElementById('soilValue').textContent = `${soil}%`;
-        document.getElementById('co2Value').textContent = `${co2} ppm`;
-        document.getElementById('lightValue').textContent = `${light}%`;
-        document.getElementById('waterValue').textContent = `${water}%`;
+        if (tempValue && temp !== null) tempValue.textContent = `${temp}°C`;
+        if (soilValue && soil !== null) soilValue.textContent = `${soil}%`;
+        if (co2Value && co2 !== null) co2Value.textContent = `${co2} ppm`;
+        if (lightValue && light !== null) lightValue.textContent = `${light}%`;
+        if (waterValue && water !== null) waterValue.textContent = `${water}%`;
         
         // Check thresholds and highlight if out of range
-        checkThreshold('temp', temp, savedThresholds.temp);
-        checkThreshold('soil', soil, savedThresholds.soil);
-        checkThreshold('co2', co2, savedThresholds.co2);
-        checkThreshold('light', light, savedThresholds.light);
-        checkThreshold('water', water, savedThresholds.water);
+        const savedThresholds = JSON.parse(localStorage.getItem('agriTechThresholds')) || {};
+        if (temp !== null) checkThreshold('temp', temp, savedThresholds.temp);
+        if (soil !== null) checkThreshold('soil', soil, savedThresholds.soil);
+        if (co2 !== null) checkThreshold('co2', co2, savedThresholds.co2);
+        if (light !== null) checkThreshold('light', light, savedThresholds.light);
+        if (water !== null) checkThreshold('water', water, savedThresholds.water);
         
+        // Log sensor readings to history
         const now = new Date();
         historyData.unshift({
             datetime: now.toLocaleString(currentLang === 'fr' ? 'fr-FR' : 'en-US'),
             action: translations[currentLang].actions.sensorReading,
             device: translations[currentLang].actions.allSensors,
-            value: `T:${temp}°C, SH:${soil}%, CO2:${co2}ppm, L:${light}%, W:${water}%`
+            value: `T:${temp !== null ? temp : '--'}°C, SH:${soil !== null ? soil : '--'}%, CO2:${co2 !== null ? co2 : '--'}ppm, L:${light !== null ? light : '--'}%, W:${water !== null ? water : '--'}%`,
+            user: "System"
         });
         
         if (historyData.length > 100) {
@@ -1047,14 +1098,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         localStorage.setItem('agriTechHistory', JSON.stringify(historyData));
         
-        if (document.getElementById('history').classList.contains('active')) {
+        if (document.getElementById('history') && document.getElementById('history').classList.contains('active')) {
             renderHistoryTable();
         }
         
         // Restore button text
-        setTimeout(() => {
-            refreshSensorsBtn.innerHTML = `<i class="bi bi-arrow-repeat"></i><span data-i18n="sensors.refresh">${translations[currentLang].sensors.refresh}</span>`;
-        }, 500);
+        if (refreshSensorsBtn) {
+            setTimeout(() => {
+                refreshSensorsBtn.innerHTML = `<i class="bi bi-arrow-repeat"></i><span data-i18n="sensors.refresh">${translations[currentLang].sensors.refresh}</span>`;
+            }, 500);
+        }
     }
     
     // Update circular gauge
@@ -1074,90 +1127,80 @@ document.addEventListener('DOMContentLoaded', function() {
     function checkThreshold(sensor, value, threshold) {
         if (!threshold) return;
         
-        const sensorCard = document.getElementById(`${sensor}Value`).closest('.sensor-card');
+        const sensorCard = document.getElementById(`${sensor}Value`);
         if (!sensorCard) return;
         
+        const card = sensorCard.closest('.sensor-card');
+        if (!card) return;
+        
         if (value < threshold.min || value > threshold.max) {
-            sensorCard.classList.add('threshold-alert');
+            card.classList.add('threshold-alert');
         } else {
-            sensorCard.classList.remove('threshold-alert');
+            card.classList.remove('threshold-alert');
         }
     }
     
-    refreshSensorsBtn.addEventListener('click', updateSensors);
+    if (refreshSensorsBtn) {
+        refreshSensorsBtn.addEventListener('click', updateSensors);
+    }
     
-    // Weather API implementation
+    // Weather API implementation - using real API call
     async function fetchWeather() {
         const weatherWidget = document.getElementById('weatherWidget');
+        if (!weatherWidget) return;
+        
         const weatherIcon = weatherWidget.querySelector('.weather-icon i');
         const weatherTemp = weatherWidget.querySelector('.weather-temp');
         const weatherDesc = weatherWidget.querySelector('.weather-desc');
         
         try {
-            // First get user's approximate location
-            const position = await new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject);
-            });
+            // Try to get weather data from API
+            const response = await fetch('/weather');
+            const data = await response.json();
             
-            const { latitude, longitude } = position.coords;
-            
-            // Use OpenWeatherMap API (you would need to sign up for an API key)
-            // For demo purposes, we'll use a mock response
-            // const apiKey = 'your_api_key';
-            // const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`);
-            // const data = await response.json();
-            
-            // Mock response for demo
-            const mockData = {
-                main: { temp: 22.5 },
-                weather: [{ 
-                    description: 'Partly cloudy',
-                    main: 'Clouds',
-                    icon: '03d'
-                }]
-            };
-            const data = mockData;
-            
-            // Update weather widget
-            weatherTemp.textContent = `${Math.round(data.main.temp)}°C`;
-            weatherDesc.textContent = data.weather[0].description;
-            
-            // Set appropriate icon
-            const weatherMain = data.weather[0].main.toLowerCase();
-            let iconClass = 'bi-cloud';
-            
-            if (weatherMain.includes('clear')) {
-                iconClass = 'bi-sun';
-            } else if (weatherMain.includes('cloud')) {
-                iconClass = 'bi-cloud';
-            } else if (weatherMain.includes('rain')) {
-                iconClass = 'bi-cloud-rain';
-            } else if (weatherMain.includes('thunderstorm')) {
-                iconClass = 'bi-cloud-lightning-rain';
-            } else if (weatherMain.includes('snow')) {
-                iconClass = 'bi-snow';
-            } else if (weatherMain.includes('mist') || weatherMain.includes('fog')) {
-                iconClass = 'bi-cloud-fog';
+            if (data && weatherTemp && weatherDesc && weatherIcon) {
+                // Update weather widget
+                weatherTemp.textContent = `${Math.round(data.main.temp)}°C`;
+                weatherDesc.textContent = data.weather[0].description;
+                
+                // Set appropriate icon
+                const weatherMain = data.weather[0].main.toLowerCase();
+                let iconClass = 'bi-cloud';
+                
+                if (weatherMain.includes('clear')) {
+                    iconClass = 'bi-sun';
+                } else if (weatherMain.includes('cloud')) {
+                    iconClass = 'bi-cloud';
+                } else if (weatherMain.includes('rain')) {
+                    iconClass = 'bi-cloud-rain';
+                } else if (weatherMain.includes('thunderstorm')) {
+                    iconClass = 'bi-cloud-lightning-rain';
+                } else if (weatherMain.includes('snow')) {
+                    iconClass = 'bi-snow';
+                } else if (weatherMain.includes('mist') || weatherMain.includes('fog')) {
+                    iconClass = 'bi-cloud-fog';
+                }
+                
+                weatherIcon.className = `bi ${iconClass}`;
             }
-            
-            weatherIcon.className = `bi ${iconClass}`;
-            
         } catch (error) {
             console.error('Error fetching weather:', error);
-            weatherTemp.textContent = '--°C';
-            weatherDesc.textContent = 'Weather unavailable';
-            weatherIcon.className = 'bi bi-cloud-slash';
+            if (weatherTemp) weatherTemp.textContent = '--°C';
+            if (weatherDesc) weatherDesc.textContent = 'Weather unavailable';
+            if (weatherIcon) weatherIcon.className = 'bi bi-cloud-slash';
         }
     }
     
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
-        // Initialize particles
-        initParticles();
+        // Initialize particles if available
+        if (typeof initParticles === 'function') {
+            initParticles();
+        }
         
         // Check for saved active page
         const savedPage = getCookie('activePage');
-        if (savedPage) {
+        if (savedPage && document.getElementById(savedPage)) {
             showPage(savedPage);
         }
         
@@ -1197,11 +1240,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Fetch weather data
         fetchWeather();
-
-        // Auto-refresh weather every hour
-        setInterval(fetchWeather, 3600000);
-        
-        // Auto-refresh sensors every 30 seconds
-        setInterval(updateSensors, 30000);
     });
+
+    // Auto-refresh weather every hour
+    setInterval(fetchWeather, 3600000);
+        
+    // Auto-refresh sensors every 30 seconds
+    setInterval(updateSensors, 2000);
+    
+    // Auto-refresh device states every 10 seconds
+    setInterval(updateDeviceStates, 1000);
 });

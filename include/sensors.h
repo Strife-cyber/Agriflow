@@ -16,7 +16,7 @@
 #define DHTTYPE DHT22
 
 /** Pins des capteurs */
-#define DHT_PIN 2        // Pin pour le capteur DHT
+#define DHT_PIN 15        // Pin pour le capteur DHT
 #define PHOTO_PIN 33     // Pin pour la photorésistance
 #define MQ_PIN 32        // Pin pour le capteur MQ (CO2)
 #define TANK_PIN 34      // Pin pour le niveau du réservoir (changé pour éviter conflit)

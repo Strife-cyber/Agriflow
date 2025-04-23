@@ -11,9 +11,9 @@
  */
 
 /** Configuration MQTT */
-#define MQTT_SERVER "192.168.1.106"     // ✅ Just the IP for PubSubClient
+#define MQTT_SERVER "192.168.1.110"     // ✅ Just the IP for PubSubClient
 #define MQTT_PORT 1883
-#define PUBLISH_INTERVAL 30000          // Intervalle de publication (ms)
+#define PUBLISH_INTERVAL 5000          // Intervalle de publication (ms)
 
 /**
  * @brief Initialise le client MQTT.
