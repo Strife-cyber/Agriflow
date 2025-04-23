@@ -1244,10 +1244,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-refresh weather every hour
     setInterval(fetchWeather, 3600000);
-        
-    // Auto-refresh sensors every 30 seconds
-    setInterval(updateSensors, 2000);
-    
-    // Auto-refresh device states every 10 seconds
-    setInterval(updateDeviceStates, 1000);
+
+    setInterval(async () => {
+        await updateSensors();
+        await updateDeviceStates();
+    }, 5000);
 });
