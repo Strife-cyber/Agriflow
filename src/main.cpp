@@ -14,8 +14,8 @@
  */
 
 /** WiFi Configuration */
-const char* ssid = "InfinityBox_D557";
-const char* pass = "dne4RDtB8EAT";
+const char* ssid = "TECNO CAMON 20";
+const char* pass = "2500*dark";
 
 /** Non-blocking Timers */
 static unsigned long lastPublish = 0;

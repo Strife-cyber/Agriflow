@@ -506,7 +506,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             
             const data = JSON.stringify(thresholds);
-            console.log(data);
             await fetch('/thresholds', {
                 method: 'POST',
                 headers: {
@@ -1048,39 +1047,31 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update gauges with actual values from API
         if (tempGauge && temp !== null) {
-            tempGauge.style.height = `${(temp - 10) * 100 / 30}%`;
+            tempGauge.style.height = `${(temp - 10) * 100 / 30} °C`;
         }
         
         if (soilGauge && soil !== null) {
-            soilGauge.style.height = `${soil}%`;
+            soilGauge.style.height = `${soil}`;
         }
         
         if (co2Gauge && co2 !== null) {
-            co2Gauge.style.height = `${(co2 - 300) * 100 / 700}%`;
+            co2Gauge.style.height = `${(co2 - 300) * 100 / 700} ppm`;
         }
         
         if (lightGauge && light !== null) {
-            lightGauge.style.height = `${light}%`;
+            lightGauge.style.height = `${light} lux`;
         }
         
         if (waterGauge && water !== null) {
-            waterGauge.style.height = `${water}%`;
+            waterGauge.style.height = `${water}`;
         }
         
         // Update values
         if (tempValue && temp !== null) tempValue.textContent = `${temp}°C`;
-        if (soilValue && soil !== null) soilValue.textContent = `${soil}%`;
+        if (soilValue && soil !== null) soilValue.textContent = `${soil}`;
         if (co2Value && co2 !== null) co2Value.textContent = `${co2} ppm`;
-        if (lightValue && light !== null) lightValue.textContent = `${light}%`;
-        if (waterValue && water !== null) waterValue.textContent = `${water}%`;
-        
-        // Check thresholds and highlight if out of range
-        const savedThresholds = JSON.parse(localStorage.getItem('agriTechThresholds')) || {};
-        if (temp !== null) checkThreshold('temp', temp, savedThresholds.temp);
-        if (soil !== null) checkThreshold('soil', soil, savedThresholds.soil);
-        if (co2 !== null) checkThreshold('co2', co2, savedThresholds.co2);
-        if (light !== null) checkThreshold('light', light, savedThresholds.light);
-        if (water !== null) checkThreshold('water', water, savedThresholds.water);
+        if (lightValue && light !== null) lightValue.textContent = `${light} lux`;
+        if (waterValue && water !== null) waterValue.textContent = `${water}`;
         
         // Log sensor readings to history
         const now = new Date();
@@ -1190,28 +1181,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (weatherIcon) weatherIcon.className = 'bi bi-cloud-slash';
         }
     }
-    
-    // Initialize
-    document.addEventListener('DOMContentLoaded', async () => {
-        // Initialize particles if available
-        if (typeof initParticles === 'function') {
-            initParticles();
-        }
-        
-        // Check for saved active page
-        const savedPage = getCookie('activePage');
-        if (savedPage && document.getElementById(savedPage)) {
-            showPage(savedPage);
-        }
-        
-        // Apply translations
-        applyTranslations();
-        
-        // Load saved thresholds
-        const savedThresholds = JSON.parse(localStorage.getItem('agriTechThresholds'));
+
+    async function updateThresholds() {
+        const response = await fetch(`/thresholds`);
+        const savedThresholds = await response.json();
         if (savedThresholds) {
             thresholdSensors.forEach(sensor => {
                 if (savedThresholds[sensor]) {
+                    console.log(savedThresholds[sensor]);
                     const minRange = document.getElementById(`${sensor}MinRange`);
                     const maxRange = document.getElementById(`${sensor}MaxRange`);
                     const minInput = document.getElementById(`${sensor}MinInput`);
@@ -1230,6 +1207,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+        // Initialize particles if available
+        if (typeof initParticles === 'function') {
+            initParticles();
+        }
+        
+        // Check for saved active page
+        const savedPage = getCookie('activePage');
+        if (savedPage && document.getElementById(savedPage)) {
+            showPage(savedPage);
+        }
+        
+        // Apply translations
+        applyTranslations();
+        
+        // Load saved thresholds
+        await updateThresholds();
         
         // Update sensors and device states
         await updateSensors();
@@ -1246,7 +1243,9 @@ document.addEventListener('DOMContentLoaded', function() {
     setInterval(fetchWeather, 3600000);
 
     setInterval(async () => {
+        updateGauge();
         await updateSensors();
+        await updateThresholds();
         await updateDeviceStates();
     }, 5000);
 });

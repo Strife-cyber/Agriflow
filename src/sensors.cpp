@@ -69,7 +69,8 @@ float readSensor(const String& sensor) {
   } else if (sensor == "humidity") {
     value = analogRead(YL69_AO_PIN);
     Threshold* humidityThresh = getThreshold("soil");
-    value = 100.0 - ((value / 4095.0) * 100.0);  // Wet = higher % remplacer la valeur par defaut ici qui est de 4096
+    //value = 100.0 - ((value / 4095.0) * 100.0);  // Wet = higher % remplacer la valeur par defaut ici qui est de 4096
+    value = (value / 4095.0) * 100.0;
     Serial.print(F("Humidité du sol: "));
     Serial.print(value);
     Serial.println(F("%"));
