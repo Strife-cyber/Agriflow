@@ -22,7 +22,7 @@
  * @note This variable is global and should be accessed carefully to avoid race conditions in multi-threaded
  *       or interrupt-driven Arduino applications.
  */
-//extern bool automatic;
+extern bool automatic;
 
 /**
  * @struct Threshold
@@ -152,7 +152,8 @@ void printThresholds();
  *          their thresholds.
  * @note Ensure that sensor and actuator configurations are correct before enabling automatic
  *       mode to prevent unintended behavior.
+ * @param state
  */
-//void setAutomatic();
+void setAutomatic(bool state);
 
 #endif

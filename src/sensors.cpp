@@ -45,12 +45,14 @@ float readSensor(const String& sensor) {
     Serial.print("Valeur co2: ");
     Serial.println(value);
 
-    if (value > co2Thresh->max) setActuatorState("fan", true); // Allumer ventillateur trops de co2
-    if (value < co2Thresh->min) setActuatorState("fan", false); // Eteindre le ventillateur gaz trops petit
+    if (automatic) {
+      if (value > co2Thresh->max) setActuatorState("fan", true); // Allumer ventillateur trops de co2
+      if (value < co2Thresh->min) setActuatorState("fan", false); // Eteindre le ventillateur gaz trops petit
+    }
   } else if (sensor == "tank") {
     int state = analogRead(TANK_PIN);
     Threshold* tankThresh = getThreshold("water");
-    value = (state / tankThresh->max) * 100; // Notons que l'on dois remplacer 10000 par un seuils
+    value = (state * 100) / tankThresh->max; // Notons que l'on dois remplacer 10000 par un seuils
     Serial.print(F("Niveau du réservoir: "));
     Serial.print(value);
     Serial.println(F("%"));
@@ -64,8 +66,10 @@ float readSensor(const String& sensor) {
     Serial.print(F("Luminosité: "));
     Serial.print(value);
     Serial.println(F(" lx"));
-    if (value < lightThresh->min) setActuatorState("light", true);  // allumer la lumiere il est trop obscure
-    if (value > lightThresh->max) setActuatorState("light", false); // lumiere trop intense eteindre la lumiere
+    if (automatic) {
+      if (value < lightThresh->min) setActuatorState("light", true);  // allumer la lumiere il est trop obscure
+      if (value > lightThresh->max) setActuatorState("light", false); // lumiere trop intense eteindre la lumiere
+    }
   } else if (sensor == "humidity") {
     value = analogRead(YL69_AO_PIN);
     Threshold* humidityThresh = getThreshold("soil");
@@ -75,8 +79,10 @@ float readSensor(const String& sensor) {
     Serial.print(value);
     Serial.println(F("%"));
 
-    if (value < humidityThresh->min) setActuatorState("pump", true); // Allumer la pompe car le sol est trop rigide
-    if (value > humidityThresh->max) setActuatorState("pump", false); // Eteindre la pompe car le sol est trop mouiller
+    if (automatic) {
+      if (value < humidityThresh->min) setActuatorState("pump", true); // Allumer la pompe car le sol est trop rigide
+      if (value > humidityThresh->max) setActuatorState("pump", false); // Eteindre la pompe car le sol est trop mouiller
+    }
   } else if (sensor == "temperature") {
     sensors_event_t event;
     dht.temperature().getEvent(&event);
@@ -89,8 +95,10 @@ float readSensor(const String& sensor) {
       value = event.temperature;
       Threshold* tempThresh = getThreshold("temp");
 
-      if (value > tempThresh->max) setActuatorState("fan", true); // Allumer le ventillateur car il fait trops chaud
-      if (value < tempThresh->min) setActuatorState("fan", false); // Eteindre le ventillateur car il fait trops froid
+      if (automatic) {
+        if (value > tempThresh->max) setActuatorState("fan", true); // Allumer le ventillateur car il fait trops chaud
+        if (value < tempThresh->min) setActuatorState("fan", false); // Eteindre le ventillateur car il fait trops froid
+      }
     }
   }
   return isnan(value) ? 0 : value;

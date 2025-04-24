@@ -65,6 +65,19 @@ private:
      */
     static void handleActuatorState(const String& device);
 
+    /**
+     * @brief Handles automatic activation state for actuators (POST /automatic) 
+     * @details Depending on the state put in place by the user in his post request we will switch 
+     *          the state of automatic.
+    */
+    static void handleSetAutomatic();
+
+    /**
+     * @brief Handles getting of the automatic state for actuators (GET /automatic)
+     * @details Gets the currents state of automatic to use in the html css js 
+    */
+    static void handleGetAutomatic();
+
 public:
     /**
      * @brief Initializes the synchronous web server and LittleFS.

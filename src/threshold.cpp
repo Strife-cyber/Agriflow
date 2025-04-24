@@ -13,6 +13,9 @@
  * @date 21 April 2025
  */
 
+// Define this global variable here giving it a  value
+bool automatic = false;
+
 /**
  * @brief Global instance of Thresholds for storing all sensor thresholds.
  * @details Stores the minimum and maximum threshold values for all sensors (temperature, soil,
@@ -37,12 +40,12 @@ Thresholds thresholds;
  *       before use.
  */
 void initThresholds() {
-    //automatic = true;
+    automatic = true;
     thresholds.temp = {"temp", 10, 35};
-    thresholds.soil = {"soil", 300, 800};
+    thresholds.soil = {"soil", 300, 500};
     thresholds.co2 = {"co2", 400, 1000};
     thresholds.light = {"light", 1000, 20000};
-    thresholds.water = {"water", 1000, 9000};
+    thresholds.water = {"water", 1000, 3000};
 }
 
 /**
@@ -119,6 +122,6 @@ void printThresholds() {
  *       enabling automatic mode.
  */
 void setAutomatic(bool state) {
-    // automatic = state;
+    automatic = state;
     Serial.println(state ? "Automatic mode enabled" : "Automatic mode disabled");
 }

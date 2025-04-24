@@ -93,6 +93,8 @@ void WebServerManager::handleDeviceControl() {
   }
 }
 
+
+
 /**
  * @brief Handles sensor reading requests (GET /temp, /soil, etc.).
  * @details Retrieves the current reading for a specified sensor using readSensor and returns it as a JSON response
@@ -210,6 +212,50 @@ void WebServerManager::handleActuatorState(const String& device) {
   // Create JSON document for response
   JsonDocument doc;
   doc["value"] = getActuatorState(device); // Get actuator state
+
+  // Serialize JSON and send response
+  String jsonResponse;
+  serializeJson(doc, jsonResponse);
+  server.send(200, "application/json", jsonResponse);
+}
+
+/**
+ * @brief Handles automatic activation state for actuators (POST /automatic) 
+ * @details Depending on the state put in place by the user in their POST request, 
+ *          we will switch the state of automatic mode.
+*/
+void WebServerManager::handleSetAutomatic() {
+  String jsonBody = server.arg("plain");
+  if (jsonBody.isEmpty()) {
+    server.send(400, F("application/json"), F("{\"error\": \"Aucun corps JSON reçu\"}"));
+    return;
+  }
+
+  JsonDocument doc;
+  DeserializationError error = deserializeJson(doc, jsonBody);
+  if (error) {
+    server.send(400, F("application/json"), F("{\"error\": \"Format JSON invalide\"}"));
+    return;
+  }
+
+  if (doc["automatic"].is<bool>()) {
+    bool value = doc["automatic"];
+    setAutomatic(value);
+    String response = "{\"success\": true, \"automatic\": " + String(value ? "true" : "false") + "}";
+    server.send(200, "application/json", response);
+  } else {
+    server.send(400, F("application/json"), F("{\"error\": \"Clé 'automatic' manquante\"}"));
+  }
+}
+
+/**
+ * @brief Handles getting of the automatic state for actuators (GET /automatic)
+ * @details Gets the currents state of automatic to use in the html css js 
+*/
+void WebServerManager::handleGetAutomatic() {
+  // Create JSON document for response
+  JsonDocument doc;
+  doc["automatic"] = automatic;
 
   // Serialize JSON and send response
   String jsonResponse;

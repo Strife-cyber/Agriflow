@@ -217,6 +217,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: "Grow Light",
                     description: "Controls supplemental lighting for plants"
                 },
+                automatic: {
+                    title: "Automatic Mode",
+                    description: "Controls automatic mode for actuators"
+                },
                 toggle: "Toggle",
                 status: {
                     on: "ON",
@@ -330,6 +334,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     title: "Lampe de Croissance",
                     description: "Contrôle l'éclairage supplémentaire pour les plantes"
                 },
+                automatic: {
+                    title: "Mode Automatique",
+                    description: "Controle le mode automatic pour les actionneurs."
+                },
                 toggle: "Basculer",
                 status: {
                     on: "MARCHE",
@@ -383,11 +391,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const fanSwitch = document.getElementById('fanSwitch');
     const pumpSwitch = document.getElementById('pumpSwitch');
     const lightSwitch = document.getElementById('lightSwitch');
+    const automaticSwitch = document.getElementById('automaticSwitch');
     
     // Device status elements
+    const automatic = false;
     const fanStatus = document.getElementById('fanStatus');
     const pumpStatus = document.getElementById('pumpStatus');
     const lightStatus = document.getElementById('lightStatus');
+    const automaticStatus = document.getElementById('automaticStatus');
     
     // Device icons
     const fanIcon = document.getElementById('fanIcon');
@@ -752,6 +763,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update device status display
     function updateDeviceStatusDisplay(device, state) {
         let statusElement, switchElement, iconElement;
+
         switch (device) {
             case 'fan':
                 statusElement = fanStatus;
@@ -823,14 +835,47 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fetch and update all device states - using the same API endpoints as the first code
     async function updateDeviceStates() {
-        const fanState = await getValue('state/fan');
-        const pumpState = await getValue('state/pump');
-        const lightState = await getValue('state/light');
+        try {
+            const response = await fetch('/automatic');
+            let data = await response.json();
 
-        if (fanState !== null) updateDeviceStatusDisplay('fan', fanState);
-        if (pumpState !== null) updateDeviceStatusDisplay('pump', pumpState);
-        if (lightState !== null) updateDeviceStatusDisplay('light', lightState);
+            if (!data['automatic']) {
+                [fanSwitch, pumpSwitch, lightSwitch].forEach(sw => {
+                    sw.disabled = false;
+                }); 
+            } else {
+                [fanSwitch, pumpSwitch, lightSwitch].forEach(sw => {
+                    sw.disabled = true;
+                });
+            }
+
+            const fanState = await getValue('state/fan');
+            const pumpState = await getValue('state/pump');
+            const lightState = await getValue('state/light');
+
+            if (fanState !== null) updateDeviceStatusDisplay('fan', fanState);
+            if (pumpState !== null) updateDeviceStatusDisplay('pump', pumpState);
+            if (lightState !== null) updateDeviceStatusDisplay('light', lightState);
+        } catch (error) {
+            [fanSwitch, pumpSwitch, lightSwitch].forEach(sw => {
+                sw.disabled = true;
+            });  
+        }
     }
+
+    automaticSwitch.addEventListener('click', async () => {
+        automatic = !automatic;
+
+        fetch('/automatic', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.parse({
+                'automatic': automatic
+            })
+        });
+    })
 
     // Device control with history logging
     function logDeviceStatus(device, state) {
